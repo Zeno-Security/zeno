@@ -1,13 +1,15 @@
 # Zeno
 
-**Zeno** is a high-security, privacy-preserving, proof-of-work CAPTCHA system designed for the modern web. It runs on the edge using Cloudflare Workers and WebAssembly (Rust), ensuring low latency and high scalability.
+**Zeno** is a high-security, privacy-preserving, proof-of-work CAPTCHA system designed for the modern web.  
+It runs on the edge using Cloudflare Workers and WebAssembly (Rust), ensuring low latency and high scalability.
 
 ![Zeno Banner](./docs/assets/banner.jpeg)
 
 ## Features
 
 - **Physics-Based Security**: Uses **Memory (Cuckatoo Cycle)** and **Time (VDF)** to physically constrain attackers.
-- **ASIC/GPU Resistant**: Default configuration (`GB=18`) requires **~32MB RAM per instance**. Attackers need 32GB RAM for 1,000 parallel threads.
+- **ASIC/GPU Resistant**: Default configuration (`GB=18`) requires **~32MB RAM per instance**.  
+Attackers need 32GB RAM for 1,000 parallel threads.
 - **Configurable Defense**: Adjust `graph_bits` (10-20) and `vdf` (10-1M) to balance security vs UX.
 - **Privacy-First**: No cookies, no tracking, no third-party scripts.
 - **Edge Deployment**: Runs entirely on Cloudflare Workers (Serverless).
@@ -114,13 +116,8 @@ npm run build
 
 ## License
 
-<!--
- Required Notice: © Copyright 2025 KSEC - Erez Kalman (kaerez[at]gmail[dot]com | www.kalman.co.il | https://github.com/zeno-security/zeno | https://github.com/kaerez)
-
+ Required Notice: © Copyright 2025 KSEC - Erez Kalman (`kaerez[at]gmail[dot]com` | `www.kalman.co.il` | `https://github.com/zeno-security/zeno` | `https://github.com/kaerez`)
  This software is licensed under the PolyForm Strict License 1.0.0.
- You may obtain a copy of the License at:
- 
- https://polyformproject.org/licenses/strict/1.0.0/
+ You may obtain a copy of the License at: https://polyformproject.org/licenses/strict/1.0.0/
 
  SPDX-License-Identifier: PolyForm-Strict-1.0.0
--->
