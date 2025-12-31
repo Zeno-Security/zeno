@@ -67,17 +67,18 @@
             font-weight: 600;
         }
 
-        /* Tabs */
+        /* Code Viewer - Light IDE Style */
         .code-viewer {
-            border: 1px solid #e1e1e1;
             border-radius: 12px;
             overflow: hidden;
-            background: #fafafa;
+            background: #ffffff;
+            border: 1px solid #e1e1e1;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
         .tabs {
             display: flex;
-            background: #f0f0f0;
+            background: #f3f3f3;
             border-bottom: 1px solid #e1e1e1;
         }
 
@@ -88,34 +89,103 @@
             cursor: pointer;
             font-size: 13px;
             font-weight: 500;
-            color: #666;
+            color: #333333;
             border-right: 1px solid #e1e1e1;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            background: #e8e8e8;
         }
 
         .tab-btn.active {
-            background: white;
-            color: #000;
+            background: #ffffff;
+            color: #000000;
             font-weight: 600;
-            border-bottom: 2px solid #007bff;
+            border-bottom: 2px solid #007acc;
             margin-bottom: -1px;
         }
 
         .tab-content {
             display: none;
-            padding: 20px;
-            font-family: 'SF Mono', Monaco, Consolas, monospace;
-            font-size: 12px;
-            color: #333;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            background: white;
+            padding: 16px 20px;
+            font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, Consolas, 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #333333;
+            white-space: pre;
+            overflow-x: auto;
+            overflow-y: auto;
+            background: #ffffff;
             text-align: left;
             height: 250px;
-            overflow-y: auto;
+            tab-size: 2;
         }
 
         .tab-content.active {
             display: block;
+        }
+
+        /* Syntax Highlighting Colors (VS Code Light Theme) */
+        .tab-content .tag {
+            color: #800000;
+        }
+
+        .tab-content .attr-name {
+            color: #e50000;
+        }
+
+        .tab-content .attr-value {
+            color: #0000ff;
+        }
+
+        .tab-content .comment {
+            color: #008000;
+            font-style: italic;
+        }
+
+        .tab-content .keyword {
+            color: #af00db;
+        }
+
+        .tab-content .function {
+            color: #795e26;
+        }
+
+        .tab-content .string {
+            color: #a31515;
+        }
+
+        .tab-content .number {
+            color: #098658;
+        }
+
+        .tab-content .property {
+            color: #001080;
+        }
+
+        .tab-content .variable {
+            color: #0070c1;
+        }
+
+        .tab-content .operator {
+            color: #000000;
+        }
+
+        .tab-content .punctuation {
+            color: #000000;
+        }
+
+        .tab-content .selector {
+            color: #800000;
+        }
+
+        .tab-content .css-property {
+            color: #e50000;
+        }
+
+        .tab-content .css-value {
+            color: #0000ff;
         }
 
         .controls {
@@ -186,14 +256,31 @@
                     <button class="tab-btn" onclick="openTab(event, 'std-js')">JavaScript</button>
                     <button class="tab-btn" onclick="openTab(event, 'std-css')">CSS</button>
                 </div>
-                <div id="std-html" class="tab-content active">&lt;zeno-widget
-                    zeno-site-key="550e8400-e29b-41d4-a716-446655440000"
-                    zeno-api-endpoint="https://zeno.secops.workers.dev/api"&gt;&lt;/zeno-widget&gt;</div>
-                <div id="std-js" class="tab-content">
-                    document.querySelector('zeno-widget').addEventListener('solve', (e) => {
-                    console.log('Token:', e.detail.token);
-                    });</div>
-                <div id="std-css" class="tab-content">/* Default Styles */</div>
+                <div id="std-html" class="tab-content active"><span class="tag">&lt;zeno-widget</span>
+                    <span class="attr-name">zeno-site-key</span><span class="operator">=</span><span
+                        class="attr-value">"550e8400-e29b-41d4-a716-446655440000"</span>
+                    <span class="attr-name">zeno-api-endpoint</span><span class="operator">=</span><span
+                        class="attr-value">"https://zeno.secops.workers.dev/api"</span>
+                    <span class="tag">&gt;&lt;/zeno-widget&gt;</span>
+                </div>
+                <div id="std-js" class="tab-content"><span class="keyword">const</span> <span
+                        class="variable">widget</span> <span class="operator">=</span> <span
+                        class="variable">document</span>.<span class="function">querySelector</span>(<span
+                        class="string">'zeno-widget'</span>);
+
+                    <span class="variable">widget</span>.<span class="function">addEventListener</span>(<span
+                        class="string">'solve'</span>, (<span class="variable">e</span>) <span
+                        class="keyword">=&gt;</span> {
+                    <span class="variable">console</span>.<span class="function">log</span>(<span
+                        class="string">'Token:'</span>, <span class="variable">e</span>.<span
+                        class="property">detail</span>.<span class="property">token</span>);
+                    });
+                </div>
+                <div id="std-css" class="tab-content"><span class="comment">/* Default styles - no customization needed
+                        */</span>
+
+                    <span class="comment">/* Widget inherits default theme */</span>
+                </div>
             </div>
         </div>
 
@@ -214,23 +301,60 @@
                     <button class="tab-btn" onclick="openTab(event, 'float-js')">JavaScript</button>
                     <button class="tab-btn" onclick="openTab(event, 'float-css')">CSS</button>
                 </div>
-                <div id="float-html" class="tab-content active">&lt;button
-                    zeno-floating="#my-widget"&gt;Verify&lt;/button&gt;
-                    &lt;zeno-widget id="my-widget" zeno-floating style="display:none"
-                    zeno-site-key="550e8400-e29b-41d4-a716-446655440000"&gt;&lt;/zeno-widget&gt;</div>
-                <div id="float-js" class="tab-content">// Global floating handler included in library
-                    document.addEventListener('click', (e) => {
-                    const trigger = e.target.closest('[zeno-floating]');
-                    if (trigger) {
-                    const id = trigger.getAttribute('zeno-floating');
-                    const widget = document.querySelector(id);
-                    if (widget) {
-                    widget.style.display = 'block';
-                    // Position widget near trigger...
+                <div id="float-html" class="tab-content active"><span class="comment">&lt;!-- Trigger button
+                        --&gt;</span>
+                    <span class="tag">&lt;button</span> <span class="attr-name">zeno-floating</span><span
+                        class="operator">=</span><span class="attr-value">"#my-widget"</span><span
+                        class="tag">&gt;</span>Verify<span class="tag">&lt;/button&gt;</span>
+
+                    <span class="comment">&lt;!-- Hidden widget --&gt;</span>
+                    <span class="tag">&lt;zeno-widget</span>
+                    <span class="attr-name">id</span><span class="operator">=</span><span
+                        class="attr-value">"my-widget"</span>
+                    <span class="attr-name">zeno-floating</span>
+                    <span class="attr-name">style</span><span class="operator">=</span><span
+                        class="attr-value">"display:none"</span>
+                    <span class="attr-name">zeno-site-key</span><span class="operator">=</span><span
+                        class="attr-value">"550e8400-..."</span>
+                    <span class="attr-name">zeno-api-endpoint</span><span class="operator">=</span><span
+                        class="attr-value">"..."</span>
+                    <span class="tag">&gt;&lt;/zeno-widget&gt;</span>
+                </div>
+                <div id="float-js" class="tab-content"><span class="comment">// Global floating handler (included in
+                        library)</span>
+                    <span class="variable">document</span>.<span class="function">addEventListener</span>(<span
+                        class="string">'click'</span>, (<span class="variable">e</span>) <span
+                        class="keyword">=&gt;</span> {
+                    <span class="keyword">const</span> <span class="variable">trigger</span> <span
+                        class="operator">=</span> <span class="variable">e</span>.<span
+                        class="property">target</span>.<span class="function">closest</span>(<span
+                        class="string">'[zeno-floating]'</span>);
+
+                    <span class="keyword">if</span> (<span class="variable">trigger</span>) {
+                    <span class="keyword">const</span> <span class="variable">id</span> <span class="operator">=</span>
+                    <span class="variable">trigger</span>.<span class="function">getAttribute</span>(<span
+                        class="string">'zeno-floating'</span>);
+                    <span class="keyword">const</span> <span class="variable">widget</span> <span
+                        class="operator">=</span> <span class="variable">document</span>.<span
+                        class="function">querySelector</span>(<span class="variable">id</span>);
+
+                    <span class="keyword">if</span> (<span class="variable">widget</span>) {
+                    <span class="variable">widget</span>.<span class="property">style</span>.<span
+                        class="property">display</span> <span class="operator">=</span> <span
+                        class="string">'block'</span>;
                     }
                     }
-                    });</div>
-                <div id="float-css" class="tab-content">/* Default Styles */</div>
+                    });
+                </div>
+                <div id="float-css" class="tab-content"><span class="comment">/* Optional: Custom positioning */</span>
+
+                    <span class="selector">#my-widget</span> {
+                    <span class="css-property">position</span>: <span class="css-value">fixed</span>;
+                    <span class="css-property">bottom</span>: <span class="css-value">20px</span>;
+                    <span class="css-property">right</span>: <span class="css-value">20px</span>;
+                    <span class="css-property">z-index</span>: <span class="css-value">9999</span>;
+                    }
+                </div>
             </div>
         </div>
 
@@ -248,12 +372,45 @@
                     <button class="tab-btn" onclick="openTab(event, 'inv-js')">JavaScript</button>
                     <button class="tab-btn" onclick="openTab(event, 'inv-css')">CSS</button>
                 </div>
-                <div id="inv-html" class="tab-content active">&lt;!-- No Widget --&gt;</div>
-                <div id="inv-js" class="tab-content">import { Zeno } from 'zeno';
+                <div id="inv-html" class="tab-content active"><span class="comment">&lt;!-- No widget element needed
+                        --&gt;</span>
+                    <span class="comment">&lt;!-- Just import the library --&gt;</span>
 
-                    const zeno = new Zeno({ siteKey: '550e8400-e29b-41d4-a716-446655440000' });
-                    const { token } = await zeno.solve();</div>
-                <div id="inv-css" class="tab-content">/* N/A */</div>
+                    <span class="tag">&lt;script</span> <span class="attr-name">type</span><span
+                        class="operator">=</span><span class="attr-value">"module"</span><span class="tag">&gt;</span>
+                    <span class="keyword">import</span> { <span class="variable">Zeno</span> } <span
+                        class="keyword">from</span> <span class="string">'zeno'</span>;
+                    <span class="comment">// ...</span>
+                    <span class="tag">&lt;/script&gt;</span>
+                </div>
+                <div id="inv-js" class="tab-content"><span class="keyword">import</span> { <span
+                        class="variable">Zeno</span> } <span class="keyword">from</span> <span
+                        class="string">'zeno'</span>;
+
+                    <span class="keyword">async</span> <span class="keyword">function</span> <span
+                        class="function">protectAction</span>() {
+                    <span class="keyword">const</span> <span class="variable">zeno</span> <span
+                        class="operator">=</span> <span class="keyword">new</span> <span class="function">Zeno</span>({
+                    <span class="property">apiEndpoint</span>: <span
+                        class="string">'https://zeno.secops.workers.dev/api'</span>,
+                    <span class="property">siteKey</span>: <span
+                        class="string">'550e8400-e29b-41d4-a716-446655440000'</span>
+                    });
+
+                    <span class="keyword">try</span> {
+                    <span class="keyword">const</span> { <span class="variable">token</span> } <span
+                        class="operator">=</span> <span class="keyword">await</span> <span
+                        class="variable">zeno</span>.<span class="function">solve</span>();
+                    <span class="variable">console</span>.<span class="function">log</span>(<span
+                        class="string">'Token:'</span>, <span class="variable">token</span>);
+                    } <span class="keyword">catch</span> (<span class="variable">e</span>) {
+                    <span class="variable">console</span>.<span class="function">error</span>(<span
+                        class="string">'Failed:'</span>, <span class="variable">e</span>);
+                    }
+                    }
+                </div>
+                <div id="inv-css" class="tab-content"><span class="comment">/* No CSS needed for invisible mode
+                        */</span></div>
             </div>
         </div>
 
