@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zeno Client Demo</title>
+    <script type="module" src="https://cdn.jsdelivr.net/gh/zeno-security/zeno/dist/client/zeno.min.js"></script>
+    <style>
+        *,
+        *:before,
+        *:after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+            padding: 40px;
+            background: #f5f5f7;
+            color: #1d1d1f;
+            line-height: 1.5;
+        }
+
+        h1 {
+            font-weight: 700;
+            font-size: 32px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            gap: 40px;
+        }
+
+        .demo-row {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+            background: white;
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            align-items: start;
+        }
+
+        .widget-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        h2 {
+            margin: 0 0 10px 0;
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        /* Tabs */
+        .code-viewer {
+            border: 1px solid #e1e1e1;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fafafa;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f0f0f0;
+            border-bottom: 1px solid #e1e1e1;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            border-right: 1px solid #e1e1e1;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: #000;
+            font-weight: 600;
+            border-bottom: 2px solid #007bff;
+            margin-bottom: -1px;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+            font-size: 12px;
+            color: #333;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            background: white;
+            text-align: left;
+            height: 250px;
+            overflow-y: auto;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .controls {
+            display: grid;
+            gap: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d1d6;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'SF Mono', monospace;
+            color: #333;
+        }
+
+        button.action-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button.action-btn:hover {
+            background: #0056b3;
+        }
+
+        #inv-log {
+            font-family: inherit;
+            margin: 0;
+            font-size: 14px;
+            padding: 10px 0;
+            color: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Zeno Client Demo</h1>
+
+    <div class="container">
+
+        <div class="demo-row">
+            <div class="widget-area">
+                <h2>1. Standard</h2>
+                <p style="color:#666; font-size:14px;">The default web component.</p>
+                <zeno-widget id="zeno-std" zeno-api-endpoint="https://zeno.secops.workers.dev/api"
+                    zeno-site-key="550e8400-e29b-41d4-a716-446655440000"
+                    onsolve="console.log('Standard Solved:', event.detail.token); "></zeno-widget>
+            </div>
+            <div class="code-viewer">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openTab(event, 'std-html')">HTML</button>
+                    <button class="tab-btn" onclick="openTab(event, 'std-js')">JavaScript</button>
+                    <button class="tab-btn" onclick="openTab(event, 'std-css')">CSS</button>
+                </div>
+                <div id="std-html" class="tab-content active">&lt;zeno-widget
+                    zeno-site-key="550e8400-e29b-41d4-a716-446655440000"
+                    zeno-api-endpoint="https://zeno.secops.workers.dev/api"&gt;&lt;/zeno-widget&gt;</div>
+                <div id="std-js" class="tab-content">
+                    document.querySelector('zeno-widget').addEventListener('solve', (e) => {
+                    console.log('Token:', e.detail.token);
+                    });</div>
+                <div id="std-css" class="tab-content">/* Default Styles */</div>
+            </div>
+        </div>
+
+        <div class="demo-row">
+            <div class="widget-area">
+                <h2>2. Floating Mode</h2>
+                <p style="color:#666; font-size:14px;">Hidden until triggered.</p>
+                <button class="action-btn" zeno-floating="#zeno-float">
+                    Verify Me (Floating)
+                </button>
+                <zeno-widget id="zeno-float" zeno-api-endpoint="https://zeno.secops.workers.dev/api"
+                    zeno-site-key="550e8400-e29b-41d4-a716-446655440000" style="display: none;"
+                    onsolve="alert('Floating Solved! Token: ' + event.detail.token)"></zeno-widget>
+            </div>
+            <div class="code-viewer">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openTab(event, 'float-html')">HTML</button>
+                    <button class="tab-btn" onclick="openTab(event, 'float-js')">JavaScript</button>
+                    <button class="tab-btn" onclick="openTab(event, 'float-css')">CSS</button>
+                </div>
+                <div id="float-html" class="tab-content active">&lt;button
+                    zeno-floating="#my-widget"&gt;Verify&lt;/button&gt;
+                    &lt;zeno-widget id="my-widget" zeno-floating style="display:none"
+                    zeno-site-key="550e8400-e29b-41d4-a716-446655440000"&gt;&lt;/zeno-widget&gt;</div>
+                <div id="float-js" class="tab-content">// Global floating handler included in library
+                    document.addEventListener('click', (e) => {
+                    const trigger = e.target.closest('[zeno-floating]');
+                    if (trigger) {
+                    const id = trigger.getAttribute('zeno-floating');
+                    const widget = document.querySelector(id);
+                    if (widget) {
+                    widget.style.display = 'block';
+                    // Position widget near trigger...
+                    }
+                    }
+                    });</div>
+                <div id="float-css" class="tab-content">/* Default Styles */</div>
+            </div>
+        </div>
+
+        <!-- 3. Invisible Mode -->
+        <div class="demo-row">
+            <div class="widget-area">
+                <h2>3. Invisible API</h2>
+                <p style="color:#666; font-size:14px;">Programmatic invocation.</p>
+                <button id="btn-invisible" class="action-btn">Run Invisible Solve</button>
+                <div id="inv-log">Waiting...</div>
+            </div>
+            <div class="code-viewer">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openTab(event, 'inv-html')">HTML</button>
+                    <button class="tab-btn" onclick="openTab(event, 'inv-js')">JavaScript</button>
+                    <button class="tab-btn" onclick="openTab(event, 'inv-css')">CSS</button>
+                </div>
+                <div id="inv-html" class="tab-content active">&lt;!-- No Widget --&gt;</div>
+                <div id="inv-js" class="tab-content">import { Zeno } from 'zeno';
+
+                    const zeno = new Zeno({ siteKey: '550e8400-e29b-41d4-a716-446655440000' });
+                    const { token } = await zeno.solve();</div>
+                <div id="inv-css" class="tab-content">/* N/A */</div>
+            </div>
+        </div>
+
+        <div class="demo-row" style="display: flex; flex-direction: column; gap: 30px;">
+            <h2>4. Styling Playground</h2>
+
+            <div
+                style="margin: 30px 0; padding: 40px; background: #fafafa; border: 1px dashed #ddd; border-radius: 12px; display: flex; justify-content: center; align-items: center;">
+                <zeno-widget id="zeno-style" zeno-api-endpoint="https://zeno.secops.workers.dev/api"
+                    zeno-site-key="550e8400-e29b-41d4-a716-446655440000"></zeno-widget>
+            </div>
+
+            <div class="controls" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 30px;">
+                <div>
+                    <label>--zeno-background</label>
+                    <input type="text" value="#1a1a1a" oninput="updateStyle('--zeno-background', this.value)">
+                </div>
+                <div>
+                    <label>--zeno-color</label>
+                    <input type="text" value="#ffffff" oninput="updateStyle('--zeno-color', this.value)">
+                </div>
+                <div>
+                    <label>--zeno-border-radius</label>
+                    <input type="text" value="26px" oninput="updateStyle('--zeno-border-radius', this.value)">
+                </div>
+                <div>
+                    <label>--zeno-background-hover</label>
+                    <input type="text" value="#1a1a1a" oninput="updateStyle('--zeno-background-hover', this.value)">
+                </div>
+
+                <div>
+                    <label>--zeno-border-color</label>
+                    <input type="text" value="#444" oninput="updateStyle('--zeno-border-color', this.value)">
+                </div>
+                <div>
+                    <label>--zeno-widget-height</label>
+                    <input type="text" value="52px" oninput="updateStyle('--zeno-widget-height', this.value)">
+                </div>
+                <div>
+                    <label>--zeno-widget-width</label>
+                    <input type="text" value="260px" oninput="updateStyle('--zeno-widget-width', this.value)">
+                </div>
+                <div>
+                    <label>--zeno-widget-padding</label>
+                    <input type="text" value="12px" oninput="updateStyle('--zeno-widget-padding', this.value)">
+                </div>
+
+                <div>
+                    <label>--zeno-checkbox-background</label>
+                    <input type="text" value="#333" oninput="updateStyle('--zeno-checkbox-background', this.value)">
+                </div>
+                <div>
+                    <label>--zeno-checkbox-border</label>
+                    <input type="text" value="1px solid #555"
+                        oninput="updateStyle('--zeno-checkbox-border', this.value)">
+                </div>
+                <div>
+                    <label>--zeno-checkbox-border-radius</label>
+                    <input type="text" value="8px" oninput="updateStyle('--zeno-checkbox-border-radius', this.value)">
+                </div>
+                <div>
+                    <label>--zeno-checkbox-size</label>
+                    <input type="text" value="24px" oninput="updateStyle('--zeno-checkbox-size', this.value)">
+                </div>
+
+                <div style="grid-column: span 2">
+                    <label>--zeno-font</label>
+                    <input type="text" value="system-ui" oninput="updateStyle('--zeno-font', this.value)">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function openTab(evt, tabId) {
+            const viewer = evt.currentTarget.closest('.code-viewer');
+            const contents = viewer.getElementsByClassName('tab-content');
+            for (let i = 0; i < contents.length; i++) {
+                contents[i].style.display = 'none';
+                contents[i].classList.remove('active');
+            }
+            const tabs = viewer.getElementsByClassName('tab-btn');
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].className = tabs[i].className.replace(" active", "");
+            }
+            document.getElementById(tabId).style.display = 'block';
+            evt.currentTarget.className += " active";
+        }
+    </script>
+
+    <script type="module">
+        import { Zeno } from 'https://cdn.jsdelivr.net/gh/zeno-security/zeno/dist/client/zeno.min.js';
+
+        // Invisible Mode Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('btn-invisible');
+            if (btn) {
+                btn.addEventListener('click', async () => {
+                    const log = document.getElementById('inv-log');
+                    log.innerText = "Processing...";
+                    try {
+                        const zeno = new Zeno({
+                            apiEndpoint: 'https://zeno.secops.workers.dev/api',
+                            siteKey: '550e8400-e29b-41d4-a716-446655440000'
+                        });
+                        const startTime = Date.now();
+                        const { token } = await zeno.solve();
+                        const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+                        log.innerText = `Solved! Token: ${token.substring(0, 8)}... (${duration}s)`;
+                    } catch (e) {
+                        log.innerText = "Error: " + e.toString();
+                        console.error(e);
+                    }
+                });
+            }
+
+            const widget = document.getElementById('zeno-style');
+            if (widget) {
+                widget.style.setProperty('--zeno-background', '#1a1a1a');
+                widget.style.setProperty('--zeno-color', '#ffffff');
+                widget.style.setProperty('--zeno-border-radius', '26px');
+                widget.style.setProperty('--zeno-background-hover', '#1a1a1a');
+                widget.style.setProperty('--zeno-border-color', '#444');
+                widget.style.setProperty('--zeno-widget-height', '52px');
+                widget.style.setProperty('--zeno-widget-width', '260px');
+                widget.style.setProperty('--zeno-widget-padding', '12px');
+                widget.style.setProperty('--zeno-checkbox-background', '#333');
+                widget.style.setProperty('--zeno-checkbox-border', '1px solid #555');
+                widget.style.setProperty('--zeno-checkbox-border-radius', '8px');
+                widget.style.setProperty('--zeno-checkbox-size', '24px');
+            }
+        });
+
+        window.updateStyle = (varName, value) => {
+            const widget = document.getElementById('zeno-style');
+            if (widget) {
+                widget.style.setProperty(varName, value);
+            }
+        };
+    </script>
+</body>
+
+</html>

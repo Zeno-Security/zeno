@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zeno E2E Test</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            background: #f4f4f4;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+    </style>
+    <!-- Local Client Output -->
+    <script type="module" src="./client/zeno.js"></script>
+</head>
+
+<body>
+    <h1>Zeno E2E Test Bench</h1>
+
+    <div class="card">
+        <h2>Standard Widget</h2>
+        <p>Testing against local server (127.0.0.1:8787)</p>
+
+        <zeno-widget zeno-site-key="f47ac10b-58cc-4372-a567-0e02b2c3d479" zeno-api-endpoint="http://127.0.0.1:8787/api"
+            zeno-theme="light"></zeno-widget>
+
+        <p id="status">Waiting for interaction...</p>
+    </div>
+
+    <script type="module">
+        const widget = document.querySelector('zeno-widget');
+        const status = document.getElementById('status');
+
+        widget.addEventListener('solve', (e) => {
+            console.log('Token:', e.detail.token);
+            status.innerText = '✅ Solved! Token: ' + e.detail.token.substring(0, 8) + '...';
+            status.style.color = 'green';
+        });
+
+        widget.addEventListener('error', (e) => {
+            console.error(e.detail.message);
+            status.innerText = '❌ Error: ' + e.detail.message;
+            status.style.color = 'red';
+        });
+    </script>
+</body>
+
+</html>

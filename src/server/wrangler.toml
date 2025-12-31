@@ -1,0 +1,28 @@
+# Required Notice: © Copyright 2025 KSEC - Erez Kalman (kaerez[at]gmail[dot]com | www.kalman.co.il | https://github.com/zeno-security/zeno | https://github.com/kaerez)
+#
+# This software is licensed under the PolyForm Strict License 1.0.0.
+# You may obtain a copy of the License at:
+# 
+# https://polyformproject.org/licenses/strict/1.0.0/
+#
+# SPDX-License-Identifier: PolyForm-Strict-1.0.0
+
+name = "zeno"
+main = "src/index.ts"
+compatibility_date = "2023-10-02"
+
+[[r2_buckets]]
+binding = "zeno_challenges"
+bucket_name = "zeno-challenges"
+
+[[r2_buckets]]
+binding = "zeno_tokens"
+bucket_name = "zeno-tokens"
+
+[[r2_buckets]]
+binding = "zeno_bans_day"
+bucket_name = "zeno-bans-day"
+
+# We will bundle the WASM manually or let Wrangler handle it if imported
+[build]
+command = "npm install"

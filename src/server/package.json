@@ -1,0 +1,31 @@
+{
+    "name": "zeno-server",
+    "version": "1.0.0",
+    "description": "Zeno CAPTCHA Server (Cloudflare Worker) - PolyForm Strict License",
+    "main": "src/index.ts",
+    "author": {
+        "name": "Erez Kalman",
+        "email": "kaerez@gmail.com",
+        "url": "https://www.kalman.co.il"
+    },
+    "license": "PolyForm-Strict-1.0.0",
+    "homepage": "https://github.com/Zeno-Security/zeno",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/zeno-security/zeno.git"
+    },
+    "scripts": {
+        "dev": "wrangler dev",
+        "deploy": "wrangler deploy"
+    },
+    "dependencies": {
+        "zeno-core": "file:../core/pkg",
+        "zod": "^3.22.0"
+    },
+    "devDependencies": {
+        "@cloudflare/workers-types": "^4.20230419.0",
+        "esbuild": "^0.27.2",
+        "typescript": "^5.0.0",
+        "wrangler": "^3.0.0"
+    }
+}

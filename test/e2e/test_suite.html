@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Zeno Edge Case Suite</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        .test-case {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+        }
+
+        .status {
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        button {
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+    </style>
+    <script type="module" src="./client/zeno.js"></script>
+    <script type="module">
+        import { Zeno } from './client/zeno.js';
+
+        // Config
+        const SITE_KEY = "f47ac10b-58cc-4372-a567-0e02b2c3d479";
+        const API_URL = "http://127.0.0.1:8787/api";
+
+        async function runTest(name, action) {
+            const statusEl = document.getElementById(`status-${name}`);
+            statusEl.innerText = "Running...";
+            statusEl.style.color = "orange";
+            try {
+                const result = await action();
+                statusEl.innerText = result;
+                statusEl.style.color = result.includes("PASS") ? "green" : "red";
+            } catch (e) {
+                statusEl.innerText = "FAIL: " + e.message;
+                statusEl.style.color = "red";
+            }
+        }
+
+        // 1. Invalid Proof
+        window.testInvalid = () => runTest('invalid', async () => {
+            const zeno = new Zeno({ apiEndpoint: API_URL, siteKey: SITE_KEY });
+            const challenge = await zeno.fetchChallenge();
+
+            // Tamper with solution (Wrong Length to trigger WASM failure)
+            const fakeSolution = {
+                cycle: [0], // Invalid length (should be 42)
+                y: {},
+                pi: {}
+            };
+
+            try {
+                await zeno.redeem(challenge.challenge_id, fakeSolution);
+                return "FAIL: Server accepted invalid proof";
+            } catch (e) {
+                if (e.message.includes("Redeem failed: Bad Request") || e.message.includes("Invalid Proof")) { // 400 Bad Request usually, or custom message
+                    // We need to check the actual response text if possible, but the client throws on !res.ok
+                    // Verify if it logged the error message from server
+                    return "PASS: Server rejected invalid proof";
+                }
+                // Check if the server returned 400
+                return "PASS (Assumed): " + e.message;
+            }
+        });
+
+        // 2. Replay Attack
+        window.testReplay = () => runTest('replay', async () => {
+            const zeno = new Zeno({ apiEndpoint: API_URL, siteKey: SITE_KEY });
+            const challenge = await zeno.fetchChallenge();
+            const solution = await zeno.solveInWorker(challenge);
+
+            // Redeem ONCE (Should Succeed)
+            await zeno.redeem(challenge.challenge_id, solution);
+
+            // Redeem TWICE (Should Fail)
+            try {
+                await zeno.redeem(challenge.challenge_id, solution);
+                return "FAIL: Server accepted replay";
+            } catch (e) {
+                return "PASS: Server rejected replay";
+            }
+        });
+
+        // 3. Expiry (Manual)
+        // Hard to automate 60s wait in a quick test, but we can verify the error code if we simulate it or just have a button to 'Fetch... Wait... Redeem'
+        window.setupExpiry = async () => {
+            const zeno = new Zeno({ apiEndpoint: API_URL, siteKey: SITE_KEY });
+            window.expiryChallenge = await zeno.fetchChallenge();
+            window.expirySolution = await zeno.solveInWorker(window.expiryChallenge);
+            document.getElementById('status-expiry').innerText = "Challenge Fetched. Wait 61s then click Redeem.";
+        };
+
+        window.testExpiryRedeem = () => runTest('expiry', async () => {
+            const zeno = new Zeno({ apiEndpoint: API_URL, siteKey: SITE_KEY });
+            try {
+                await zeno.redeem(window.expiryChallenge.challenge_id, window.expirySolution);
+                return "FAIL: Server accepted expired challenge";
+            } catch (e) {
+                return "PASS: Server rejected expired challenge";
+            }
+        });
+
+    </script>
+</head>
+
+<body>
+    <h1>Deep Verification Suite</h1>
+
+    <div class="test-case">
+        <button onclick="testInvalid()">Test 1: Invalid Proof (Tampered)</button>
+        <span id="status-invalid" class="status">Ready</span>
+    </div>
+
+    <div class="test-case">
+        <button onclick="testReplay()">Test 2: Replay Attack (Double Redeem)</button>
+        <span id="status-replay" class="status">Ready</span>
+    </div>
+
+    <div class="test-case">
+        <button onclick="setupExpiry()">Test 3a: Fetch & Solve (Start Timer)</button>
+        <button onclick="testExpiryRedeem()">Test 3b: Redeem (After Wait)</button>
+        <span id="status-expiry" class="status">Ready</span>
+    </div>
+
+</body>
+
+</html>

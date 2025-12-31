@@ -1,0 +1,64 @@
+# Required Notice: © Copyright 2025 KSEC - Erez Kalman (kaerez[at]gmail[dot]com | www.kalman.co.il | https://github.com/zeno-security/zeno | https://github.com/kaerez)
+#
+# This software is licensed under the PolyForm Strict License 1.0.0.
+# You may obtain a copy of the License at:
+# 
+# https://polyformproject.org/licenses/strict/1.0.0/
+#
+# SPDX-License-Identifier: PolyForm-Strict-1.0.0
+
+name = "zeno"
+main = "dist/server/worker.js"
+compatibility_date = "2023-10-02"
+
+[[r2_buckets]]
+binding = "zeno_challenges"
+bucket_name = "zeno-challenges"
+
+[[r2_buckets]]
+binding = "zeno_tokens"
+bucket_name = "zeno-tokens"
+
+[[r2_buckets]]
+binding = "zeno_bans_day"
+bucket_name = "zeno-bans-day"
+
+# Root package.json now handles install
+[vars]
+graph_bits = "22" # Global override
+# Constants for keys
+KEY_HEADERS_STRICT = "00000000-0000-0000-0000-000000000002"
+KEY_HEADERS_MIXED = "00000000-0000-0000-0000-000000000003"
+KEY_TTL_SHORT = "00000000-0000-0000-0000-000000000004"
+KEY_REUSE_TRUE = "00000000-0000-0000-0000-000000000005"
+KEY_REUSE_FALSE = "00000000-0000-0000-0000-000000000006"
+KEY_RL = "00000000-0000-0000-0000-000000000007"
+KEY_DIFF_LOW = "00000000-0000-0000-0000-000000000008"
+KEY_GRAPH_LOW = "00000000-0000-0000-0000-000000000009"
+
+# --- Headers ---
+00000000-0000-0000-0000-000000000002_allowed_origins = "^https://good\\.com$"
+00000000-0000-0000-0000-000000000002_allowed_referers = "^https://good\\.com$"
+
+00000000-0000-0000-0000-000000000003_allowed_origins = "^https://good\\.com$"
+00000000-0000-0000-0000-000000000003_allowed_referers = "^https://trusted-referer\\.com$"
+
+# --- TTL ---
+00000000-0000-0000-0000-000000000004_challenge_ttl = "1"
+00000000-0000-0000-0000-000000000004_token_ttl = "1"
+
+# --- Reuse ---
+00000000-0000-0000-0000-000000000005_token_reuse = "true"
+00000000-0000-0000-0000-000000000006_token_reuse = "false"
+
+# --- Rate Limit ---
+# Min=2, Hour=2, Day=2
+00000000-0000-0000-0000-000000000007_rate_limit_ip_min = "2"
+00000000-0000-0000-0000-000000000007_rate_limit_ip_hour = "2"
+00000000-0000-0000-0000-000000000007_rate_limit_ip_day = "2"
+
+# --- VDF/Graph ---
+00000000-0000-0000-0000-000000000008_vdf = "100"
+00000000-0000-0000-0000-000000000009_graph_bits = "22"
+
+

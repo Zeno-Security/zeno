@@ -1,0 +1,49 @@
+{
+    "name": "zeno",
+    "version": "1.0.0",
+    "description": "Zeno Security Software - Metadata and License Specification",
+    "private": false,
+    "main": "dist/client/zeno.min.js",
+    "browser": "dist/client/zeno.min.js",
+    "jsdelivr": "dist/client/zeno.min.js",
+    "scripts": {
+        "dev": "wrangler dev",
+        "deploy": "wrangler deploy",
+        "build": "npm run build:wasm && node scripts/sanitize_wasm.mjs && npm run build:client && npm run build:server && npm run sync:artifacts",
+        "sync:artifacts": "node scripts/sync_artifacts.mjs",
+        "build:wasm": "cd src/core && wasm-pack build --release --target web --out-dir pkg && wasm-pack build --release --target nodejs --out-dir pkg-node && cd ../.. && node scripts/sanitize_wasm.mjs",
+        "build:client": "cd src/client && npm install && npm run build && cd ../.. && npm run sync:artifacts",
+        "fix:benchmark": "npm run sync:artifacts",
+        "build:server": "esbuild src/server/src/index.ts --bundle --format=esm --outfile=dist/server/worker.js --external:cloudflare:* --external:./zeno.wasm --platform=node && cp src/core/pkg/zeno_core_bg.wasm dist/server/zeno.wasm && mkdir -p cloudflare && cp dist/server/worker.js cloudflare/ && cp dist/server/zeno.wasm cloudflare/ && node scripts/prepare_deploy.mjs",
+        "postbuild": "python3 scripts/apply_pkg_licenses.py",
+        "test": "echo 'Error: no test specified' && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/zeno-security/zeno.git"
+    },
+    "keywords": [
+        "security",
+        "zeno",
+        "ksec",
+        "erez",
+        "kalman"
+    ],
+    "author": {
+        "name": "Erez Kalman",
+        "email": "kaerez@gmail.com",
+        "url": "https://www.kalman.co.il"
+    },
+    "license": "PolyForm-Strict-1.0.0",
+    "homepage": "https://github.com/Zeno-Security/zeno",
+    "dependencies": {
+        "zeno-core": "file:src/core/pkg",
+        "zod": "^3.22.0"
+    },
+    "devDependencies": {
+        "@cloudflare/workers-types": "^4.20230419.0",
+        "esbuild": "^0.27.2",
+        "typescript": "^5.0.0",
+        "wrangler": "^3.0.0"
+    }
+}

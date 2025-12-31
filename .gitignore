@@ -1,0 +1,24 @@
+# Architecture Documentation - Source of Truth (Do not commit)
+arch.md
+
+# Build Artifacts
+# dist/
+pkg/
+pkg-node/
+target/
+worker.js
+
+# Node
+node_modules/
+npm-debug.log
+
+# Rust
+**/*.rs.bk
+Cargo.lock
+
+# Environment / Secrets
+.env
+.dev.vars
+wrangler.toml
+zeno_server.log
+cloudflare/

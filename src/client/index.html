@@ -1,0 +1,58 @@
+<!--
+  Required Notice: © Copyright 2025 KSEC - Erez Kalman (kaerez[at]gmail[dot]com | www.kalman.co.il | https://github.com/zeno-security/zeno | https://github.com/kaerez)
+
+  This software is licensed under the PolyForm Strict License 1.0.0.
+  You may obtain a copy of the License at:
+  * https://polyformproject.org/licenses/strict/1.0.0/
+
+  SPDX-License-Identifier: PolyForm-Strict-1.0.0
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Zeno Client Test</title>
+</head>
+
+<body>
+    <h1>Zeno Client Verification</h1>
+    <button id="solveBtn">Simulate Solve</button>
+    <pre id="output"></pre>
+
+    <script type="module">
+        import { Zeno } from './src/zeno.ts';
+
+        const output = document.getElementById('output');
+        const zeno = new Zeno();
+
+        document.getElementById('solveBtn').addEventListener('click', async () => {
+            output.textContent = 'Solving...';
+
+            // Test Challenge Vector
+            const challenge = {
+                challenge_id: 'test-id',
+                seed: '0102030405060708090a0b0c0d0e0f10',
+                discriminant: '0100000000000000000000000000000000000000000000000000000000000003', // D = -3ish (Magnitude)
+                vdf: 1000,
+                graph_bits: 10,
+                issued_at: Date.now(),
+                expires_at: Date.now() + 60000,
+                site_key: 'test-site-key'
+            };
+
+            try {
+                const start = Date.now();
+                const solution = await zeno.solve(challenge);
+                const duration = Date.now() - start;
+
+                output.textContent = `Solved in ${duration}ms\n\nResult:\n` + JSON.stringify(solution, null, 2);
+            } catch (e) {
+                output.textContent = 'Error: ' + e.message;
+                console.error(e);
+            }
+        });
+    </script>
+</body>
+
+</html>
