@@ -22,3 +22,6 @@ Cargo.lock
 wrangler.toml
 zeno_server.log
 cloudflare/
+
+# OS
+.DS_Store
