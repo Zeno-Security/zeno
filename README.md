@@ -30,7 +30,7 @@ Try the live demo: **[https://zeno.js.org/demo/](https://zeno.js.org/demo/)**
 ## Quick Start (Client)
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/gh/zeno-security/zeno/dist/client/zeno.min.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/gh/zeno-security/zeno@latest/dist/client/zeno.min.js"></script>
 <zeno-widget zeno-site-key="YOUR_SITE_KEY" zeno-api-endpoint="/api"></zeno-widget>
 ```
 

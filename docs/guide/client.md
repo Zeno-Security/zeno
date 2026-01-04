@@ -12,7 +12,7 @@
 ## Installation
 
 ```html
-<script type="module" src="https://cdn.jsdelivr.net/gh/zeno-security/zeno/dist/client/zeno.min.js"></script>
+<script type="module" src="https://cdn.jsdelivr.net/gh/zeno-security/zeno@latest/dist/client/zeno.min.js"></script>
 ```
 
 ## Usage

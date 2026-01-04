@@ -23,7 +23,7 @@
 Do not emit the `<zeno-widget>` tag. Instead, import the class.
 
 ```javascript
-import { Zeno } from 'https://cdn.jsdelivr.net/gh/zeno-security/zeno/dist/client/zeno.min.js';
+import { Zeno } from 'https://cdn.jsdelivr.net/gh/zeno-security/zeno@latest/dist/client/zeno.min.js';
 
 async function protectAction() {
     const zeno = new Zeno({
