@@ -398,7 +398,7 @@ class ZenoWidget extends HTMLElement {
     private isUsingWasm = true;
 
     static get observedAttributes() {
-        return ['zeno-api-endpoint', 'zeno-floating', 'zeno-site-key', 'zeno-i18n-human-label', 'zeno-i18n-wasm-banner'];
+        return ['zeno-api-endpoint', 'zeno-floating', 'zeno-site-key', 'zeno-i18n-human-label', 'zeno-i18n-wasm-banner', 'zeno-force-js'];
     }
 
     constructor() {
@@ -526,8 +526,10 @@ class ZenoWidget extends HTMLElement {
         this.container?.classList.add('verifying');
         this.setLabel(this.getAttribute('zeno-i18n-verifying-label') || "Verifying...");
 
+        const forceJS = this.hasAttribute('zeno-force-js');
+
         try {
-            this.zeno = new Zeno({ apiEndpoint: endpoint, siteKey });
+            this.zeno = new Zeno({ apiEndpoint: endpoint, siteKey, forceJS });
 
             // Set up progress callback
             this.zeno.onProgress = (percent: number) => {

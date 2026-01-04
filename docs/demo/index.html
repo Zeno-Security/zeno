@@ -480,6 +480,42 @@
                     <label>--zeno-font</label>
                     <input type="text" value="system-ui" oninput="updateStyle('--zeno-font', this.value)">
                 </div>
+
+                <div style="grid-column: span 2; border-top: 1px solid #eee; margin-top: 10px; padding-top: 10px;">
+                    <label style="color: #007bff;">i18n: Banner Text (WASM Fallback)</label>
+                    <input type="text" value="Enable WASM for significantly faster solving"
+                        oninput="updateAttribute('zeno-i18n-wasm-banner', this.value)">
+                </div>
+                <div style="grid-column: span 2">
+                    <label style="color: #007bff;">i18n: JS Mode Label</label>
+                    <input type="text" value="Running in compatibility mode"
+                        oninput="updateAttribute('zeno-i18n-js-mode-label', this.value)">
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-row">
+            <div class="widget-area">
+                <h2>5. JS Fallback Mode (ForceJS)</h2>
+                <p style="color:#666; font-size:14px;">Forces Pure JS solver with UI banners.</p>
+                <zeno-widget id="zeno-js" zeno-api-endpoint="https://zeno.secops.workers.dev/api"
+                    zeno-site-key="550e8400-e29b-41d4-a716-446655440000" zeno-force-js
+                    onsolve="console.log('JS Solved:', event.detail.token)"></zeno-widget>
+            </div>
+            <div class="code-viewer">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openTab(event, 'js-html')">HTML</button>
+                    <button class="tab-btn" onclick="openTab(event, 'js-js')">JavaScript</button>
+                </div>
+                <div id="js-html" class="tab-content active"><span class="tag">&lt;zeno-widget</span>
+                    <span class="attr-name">zeno-site-key</span><span class="operator">=</span><span
+                        class="attr-value">"..."</span>
+                    <span class="attr-name">zeno-force-js</span> <span class="comment">&lt;!-- Forces JS Mode
+                        --&gt;</span>
+                    <span class="tag">&gt;&lt;/zeno-widget&gt;</span>
+                </div>
+                <div id="js-js" class="tab-content"><span class="comment">// No special JS needed.
+                        // The 'zeno-force-js' attribute forces the worker to skip WASM checks.</span></div>
             </div>
         </div>
 
@@ -549,6 +585,13 @@
             const widget = document.getElementById('zeno-style');
             if (widget) {
                 widget.style.setProperty(varName, value);
+            }
+        };
+
+        window.updateAttribute = (attrName, value) => {
+            const widget = document.getElementById('zeno-style');
+            if (widget) {
+                widget.setAttribute(attrName, value);
             }
         };
     </script>
