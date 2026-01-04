@@ -40,6 +40,14 @@ if (fs.existsSync(distClientDir)) {
                 fs.copyFileSync(src, destDocs);
             }
 
+            // Sync to docs/demo (for demo page)
+            const destDemo = path.join(rootDir, 'docs/demo', file);
+            if (fs.statSync(src).isDirectory()) {
+                fs.cpSync(src, destDemo, { recursive: true });
+            } else {
+                fs.copyFileSync(src, destDemo);
+            }
+
             // Sync to test/e2e/client
             const testClientDir = path.join(rootDir, 'test/e2e/client');
             if (fs.existsSync(testClientDir)) {
