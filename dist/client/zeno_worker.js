@@ -214,7 +214,7 @@ function Q(n, t) {
   return e < 0n && (e = -e, i = -i, o = -o), { gcd: e, x: i, y: o };
 }
 function it(n, t) {
-  const e = n.a, s = t.a, i = n.b, l = t.b, o = t.c, r = (i + l) / 2n, c = Q(e, s), b = c.gcd, g = c.y, h = Q(b, r), f = h.gcd, a = h.x, m = h.y, y = a * g, w = m, _ = y * (i - l), p = w * o, A = _ - p, W = 2n * e / f;
+  const e = n.a, s = t.a, i = n.b, l = t.b, o = t.c, r = (i + l) / 2n, c = Q(e, s), b = c.gcd, g = c.y, h = Q(b, r), f = h.gcd, a = h.x, m = h.y, y = a * g, w = m, _ = y * (i - l), p = w * o * 2n, A = _ - p, W = 2n * e / f;
   let v = A % W;
   v < 0n && (v += W);
   const E = v, B = f * f, T = e * s / B, I = s / f * E, M = l + I, C = M * M - n.discriminant, J = T * 4n, G = C / J;
