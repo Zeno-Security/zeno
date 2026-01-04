@@ -24,26 +24,10 @@ export interface ZenoSolution {
     pi: object;
 }
 
-export interface ZenoChallenge {
-    challenge_id: string;
-    seed: string;
-    discriminant: string;
-    vdf: number;
-    graph_bits: number;
-    issued_at: number;
-    expires_at: number;
-    site_key: string;
-}
-
-export interface ZenoSolution {
-    cycle: number[];
-    y: object;
-    pi: object;
-}
-
 export interface ZenoConfig {
     apiEndpoint: string;
     siteKey: string;
+    forceJS?: boolean;
 }
 
 // @ts-ignore
@@ -53,37 +37,24 @@ export class Zeno extends EventTarget {
     private worker: Worker;
     private config: ZenoConfig;
     private _token: string | null = null;
+    private _onProgress: ((percent: number) => void) | null = null;
+    private _onModeDetected: ((mode: 'wasm' | 'js', wasmSupported: boolean) => void) | null = null;
 
     constructor(config: ZenoConfig) {
         super();
         this.config = config;
-        // Keep workerUrl to force Vite build
         console.debug("Zeno Lib Initialized");
 
-        // Initialize worker
-        // Workaround for Cross-Origin Worker SecurityError in some envs
-
-        // 1. Explicit Config Override (Best for Benchmark)
-        // If config includes a workerPath (not in interface yet, but we can check args or infer)
-        // ...
-
-        // 2. Local Dev / Benchmark Inference
-        // If we are running on localhost/127.0.0.1, prefer local scripts over CDN
         const isLocal = typeof window !== 'undefined' &&
             (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
 
         let workerScriptUrl: string;
 
         if (workerUrl && (workerUrl.includes('worker') || workerUrl.endsWith('.ts'))) {
-            // Vite Dev Mode
             workerScriptUrl = workerUrl;
         } else if (isLocal) {
-            // Benchmark / Local Server Mode
-            // Assume zeno_worker.js is in the same directory as zeno.min.js or root
-            // For benchmark/benchmark.html running on :8001, zeno_worker.js is known to be synced there.
             workerScriptUrl = 'zeno_worker.js';
         } else {
-            // Production / CDN Fallback
             const scriptUrl = import.meta.url;
             workerScriptUrl = scriptUrl.replace(/zeno(\.min)?\.js(\?.*)?$/, 'zeno_worker.js');
         }
@@ -103,20 +74,20 @@ export class Zeno extends EventTarget {
         return this._token;
     }
 
+    public set onProgress(callback: ((percent: number) => void) | null) {
+        this._onProgress = callback;
+    }
+
+    public set onModeDetected(callback: ((mode: 'wasm' | 'js', wasmSupported: boolean) => void) | null) {
+        this._onModeDetected = callback;
+    }
+
     public async solve(): Promise<{ token: string }> {
-        // 1. Fetch Challenge
         const challenge = await this.fetchChallenge();
-
-        // 2. Solve in Worker
         const solution = await this.solveInWorker(challenge);
-
-        // 3. Redeem for Token
         const token = await this.redeem(challenge.challenge_id, solution);
         this._token = token;
-
-        // Emit event
         this.dispatchEvent(new CustomEvent('solve', { detail: { token } }));
-
         return { token };
     }
 
@@ -153,21 +124,38 @@ export class Zeno extends EventTarget {
         });
         if (!res.ok) throw new Error(`Redeem failed: ${res.statusText}`);
         const data = await res.json();
-        return data.token; // Spec implies token is returned
+        return data.token;
     }
 
     private async solveInWorker(challenge: ZenoChallenge): Promise<ZenoSolution> {
         return new Promise((resolve, reject) => {
             const handleMessage = (event: MessageEvent) => {
-                const { type, payload, error } = event.data;
-                this.worker.removeEventListener('message', handleMessage);
-                this.worker.removeEventListener('error', handleError);
+                const { type, payload, error, percent, mode, wasmSupported } = event.data;
+
+                if (type === 'PROGRESS') {
+                    if (this._onProgress) {
+                        this._onProgress(percent);
+                    }
+                    this.dispatchEvent(new CustomEvent('progress', { detail: { percent } }));
+                    return; // Don't remove listener, keep receiving progress
+                }
+
+                if (type === 'STATUS') {
+                    if (this._onModeDetected) {
+                        this._onModeDetected(mode, wasmSupported);
+                    }
+                    this.dispatchEvent(new CustomEvent('modedetected', { detail: { mode, wasmSupported } }));
+                    return; // Don't remove listener
+                }
 
                 if (type === 'SOLVED') {
-                    // Inject memory usage into the result payload (non-standard but useful for benchmarking)
+                    this.worker.removeEventListener('message', handleMessage);
+                    this.worker.removeEventListener('error', handleError);
                     (payload as any).memoryUsage = (event.data as any).memory;
                     resolve(payload);
                 } else if (type === 'ERROR') {
+                    this.worker.removeEventListener('message', handleMessage);
+                    this.worker.removeEventListener('error', handleError);
                     reject(new Error(error));
                 }
             };
@@ -180,8 +168,7 @@ export class Zeno extends EventTarget {
 
             this.worker.addEventListener('message', handleMessage);
             this.worker.addEventListener('error', handleError);
-            // Determine WASM URL relative to this script (library logic)
-            // Just like workerScriptUrl, but for .wasm
+
             let wasmUrl = "";
 
             // @ts-ignore
@@ -189,20 +176,11 @@ export class Zeno extends EventTarget {
                 // @ts-ignore
                 wasmUrl = window.ZENO_WASM_URL;
             } else if (import.meta.url) {
-                // Production: Replace .js (or .min.js) with .wasm aggressively
-                // If loaded as "zeno.js" or "zeno.min.js", this works.
-                // If loaded with query params or other extensions, be careful.
                 wasmUrl = import.meta.url.replace(/zeno(\.min)?\.js(\?.*)?$/, 'zeno.wasm');
-
-                // If no replacement happened (e.g. main.js importing Zeno source?), fallback.
                 if (wasmUrl === import.meta.url) {
-                    // Start of improvement: Calculate base path and append zeno.wasm
-                    // This handles zeno.js being renamed or embedded in a bundle with a different name
                     try {
                         wasmUrl = new URL('zeno.wasm', import.meta.url).href;
                     } catch (e) {
-                        // Last resort: If import.meta.url is invalid (e.g. blob), use absolute path from root
-                        // This is safer than relative path for Blob Workers which have blob: origins
                         try {
                             wasmUrl = new URL('/zeno.wasm', window.location.href).href;
                         } catch (e2) {
@@ -211,7 +189,6 @@ export class Zeno extends EventTarget {
                     }
                 }
             } else {
-                // No import.meta.url? Fallback to root absolute
                 try {
                     wasmUrl = new URL('/zeno.wasm', window.location.href).href;
                 } catch (e) {
@@ -219,7 +196,12 @@ export class Zeno extends EventTarget {
                 }
             }
 
-            this.worker.postMessage({ type: 'SOLVE', challenge, wasm_url: wasmUrl });
+            this.worker.postMessage({
+                type: 'SOLVE',
+                challenge,
+                wasm_url: wasmUrl,
+                force_js: this.config.forceJS
+            });
         });
     }
 
@@ -243,7 +225,7 @@ const TEMPLATE = `
     --zeno-border-color: #dddddd8f;
     --zeno-border-radius: 14px;
     --zeno-widget-height: 50px;
-    --zeno-widget-width: 250px; /* Slightly larger default to fit content */
+    --zeno-widget-width: 250px;
     --zeno-widget-padding: 10px;
     --zeno-color: #212121;
     --zeno-font: system-ui, -apple-system, sans-serif;
@@ -252,6 +234,31 @@ const TEMPLATE = `
     --zeno-checkbox-border-radius: 6px;
     --zeno-checkbox-background: #fafafa91;
     --zeno-spinner-color: #000;
+    --zeno-banner-background: #dc3545;
+    --zeno-banner-color: #ffffff;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.wasm-banner {
+    display: none;
+    background: var(--zeno-banner-background);
+    color: var(--zeno-banner-color);
+    font-family: var(--zeno-font);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px 12px;
+    text-align: center;
+    border-radius: var(--zeno-border-radius) var(--zeno-border-radius) 0 0;
+    margin-bottom: -1px;
+}
+
+.wasm-banner.visible {
+    display: block;
 }
 
 .container {
@@ -272,6 +279,10 @@ const TEMPLATE = `
     user-select: none;
 }
 
+.container.has-banner {
+    border-radius: 0 0 var(--zeno-border-radius) var(--zeno-border-radius);
+}
+
 .checkbox {
     width: var(--zeno-checkbox-size);
     height: var(--zeno-checkbox-size);
@@ -282,6 +293,7 @@ const TEMPLATE = `
     align-items: center;
     justify-content: center;
     position: relative;
+    flex-shrink: 0;
 }
 
 .spinner {
@@ -296,7 +308,7 @@ const TEMPLATE = `
 
 .checkmark {
     display: none;
-    color: #4CAF50; /* Fallback green */
+    color: #4CAF50;
     font-size: 18px;
     font-weight: bold;
 }
@@ -305,9 +317,26 @@ const TEMPLATE = `
     to { transform: rotate(360deg); }
 }
 
+.label-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    min-width: 0;
+}
+
 .label {
     font-size: 14px;
     font-weight: 500;
+}
+
+.sublabel {
+    font-size: 11px;
+    color: #666;
+    display: none;
+}
+
+.sublabel.visible {
+    display: block;
 }
 
 /* States */
@@ -315,15 +344,10 @@ const TEMPLATE = `
 .container.verified .checkmark { display: block; }
 .container.verified .checkbox { border-color: transparent; }
 
-/* Accessible Hidden Input */
-    display: none;
-}
-
 .footer {
     position: absolute;
     bottom: 2px;
-    bottom: 2px;
-    right: 12px; /* Sufficient padding from border */
+    right: 12px;
     font-size: 10px;
     color: var(--zeno-color) !important;
     text-decoration: underline;
@@ -333,23 +357,32 @@ const TEMPLATE = `
     transform-origin: bottom right;
     transition: color 0.2s;
 }
+
 a.footer, a.footer:visited, a.footer:hover, a.footer:active {
     color: var(--zeno-color) !important;
 }
+
 .footer * {
     color: var(--zeno-color) !important;
 }
+
 .footer:hover {
     opacity: 1;
 }
 </style>
-<div class="container" id="box" tabindex="0" role="checkbox" aria-checked="false" style="position: relative;">
-    <div class="checkbox">
-        <div class="spinner"></div>
-        <div class="checkmark">✓</div>
+<div class="wrapper">
+    <div class="wasm-banner" id="wasmBanner">Enable WASM for significantly faster solving</div>
+    <div class="container" id="box" tabindex="0" role="checkbox" aria-checked="false" style="position: relative;">
+        <div class="checkbox">
+            <div class="spinner"></div>
+            <div class="checkmark">✓</div>
+        </div>
+        <div class="label-container">
+            <div class="label" id="text">I am human</div>
+            <div class="sublabel" id="sublabel"></div>
+        </div>
+        <a href="https://github.com/zeno-security/zeno" target="_blank" class="footer" style="position: absolute; bottom: 2px; right: 12px; transform: scale(0.6); transform-origin: bottom right; color: var(--zeno-color) !important; text-decoration: underline;">Zeno</a>
     </div>
-    <div class="label" id="text">I am human</div>
-    <a href="https://github.com/zeno-security/zeno" target="_blank" class="footer" style="position: absolute; bottom: 2px; right: 12px; transform: scale(0.6); transform-origin: bottom right; color: var(--zeno-color) !important; text-decoration: underline;">Zeno</a>
 </div>
 `;
 
@@ -358,11 +391,14 @@ class ZenoWidget extends HTMLElement {
     private shadow: ShadowRoot;
     private container: HTMLElement | null = null;
     private label: HTMLElement | null = null;
+    private sublabel: HTMLElement | null = null;
+    private wasmBanner: HTMLElement | null = null;
     private isSolving = false;
     private isSolved = false;
+    private isUsingWasm = true;
 
     static get observedAttributes() {
-        return ['zeno-api-endpoint', 'zeno-floating', 'zeno-site-key', 'zeno-i18n-human-label'];
+        return ['zeno-api-endpoint', 'zeno-floating', 'zeno-site-key', 'zeno-i18n-human-label', 'zeno-i18n-wasm-banner'];
     }
 
     constructor() {
@@ -374,6 +410,8 @@ class ZenoWidget extends HTMLElement {
     connectedCallback() {
         this.container = this.shadow.getElementById('box');
         this.label = this.shadow.getElementById('text');
+        this.sublabel = this.shadow.getElementById('sublabel');
+        this.wasmBanner = this.shadow.getElementById('wasmBanner');
 
         this.container?.addEventListener('click', () => this.startVerification());
         this.container?.addEventListener('keydown', (e) => {
@@ -383,17 +421,10 @@ class ZenoWidget extends HTMLElement {
             }
         });
 
-        // Initialize Floating Logic if needed
         this.setupFloating();
-
-        // Initialize footer color
         setTimeout(() => this.updateFooterContrast(), 0);
-
-        // Initialize label text
         this.updateHumanLabel();
 
-        // Observe style changes (best effort via polling or mutation if needed, but for now just initial)
-        // For the demo explicitly calling setProperty, we might want a method to force update or just use a MutationObserver on style attribute
         const observer = new MutationObserver(() => this.updateFooterContrast());
         observer.observe(this, { attributes: true, attributeFilter: ['style'] });
     }
@@ -402,11 +433,36 @@ class ZenoWidget extends HTMLElement {
         if (name === 'zeno-i18n-human-label') {
             this.updateHumanLabel();
         }
+        if (name === 'zeno-i18n-wasm-banner' && this.wasmBanner) {
+            this.wasmBanner.innerText = newValue || "Enable WASM for significantly faster solving";
+        }
     }
 
     private updateHumanLabel() {
         if (this.label && !this.isSolving && !this.isSolved) {
             this.label.innerText = this.getAttribute('zeno-i18n-human-label') || "I am human";
+        }
+    }
+
+    private showWasmBanner() {
+        if (this.wasmBanner) {
+            this.wasmBanner.classList.add('visible');
+            this.wasmBanner.innerText = this.getAttribute('zeno-i18n-wasm-banner') || "Enable WASM for significantly faster solving";
+            this.container?.classList.add('has-banner');
+        }
+    }
+
+    private hideWasmBanner() {
+        if (this.wasmBanner) {
+            this.wasmBanner.classList.remove('visible');
+            this.container?.classList.remove('has-banner');
+        }
+    }
+
+    private updateProgress(percent: number) {
+        if (this.label && this.isSolving) {
+            const verifyingLabel = this.getAttribute('zeno-i18n-verifying-label') || "Verifying";
+            this.label.innerText = `${verifyingLabel}... ${percent}%`;
         }
     }
 
@@ -421,15 +477,12 @@ class ZenoWidget extends HTMLElement {
     }
 
     private getContrastColor(hexColor: string): string {
-        // Default to black if invalid
         if (!hexColor || !hexColor.startsWith('#')) return '#000000';
 
-        // Parse hex
         const r = parseInt(hexColor.substr(1, 2), 16);
         const g = parseInt(hexColor.substr(3, 2), 16);
         const b = parseInt(hexColor.substr(5, 2), 16);
 
-        // WCAG Relative Luminance Formula
         const getLuminance = (c: number) => {
             const v = c / 255;
             return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
@@ -439,28 +492,17 @@ class ZenoWidget extends HTMLElement {
         const Lwhite = 1;
         const Lblack = 0;
 
-        // Contrast Ratio: (L1 + 0.05) / (L2 + 0.05)
         const contrastWhite = (Lwhite + 0.05) / (Lbg + 0.05);
         const contrastBlack = (Lbg + 0.05) / (Lblack + 0.05);
 
-        // Prefer highest contrast, ensuring strictly > 4.5:1 if possible
-        // If white satisfies, pick white (prefer light text on dark if both pass, or strict ratio check)
-        // Standard logic: maximize contrast
         return (contrastWhite > contrastBlack) ? '#ffffff' : '#000000';
     }
 
     private setupFloating() {
-        // Check if there is a trigger for this widget provided via external attribute logic
-        // Though spec says button has `zeno-floating="#id"`. So we wait for that button to click us?
-        // Or we handle positioning.
-        // Spec 2.3: Button has `zeno-floating="#floating-captcha"`.
-        // We need a global listener or observer? usage: <button zeno-floating="#id">
-        // It's cleaner to handle this by querying triggers on document load or using a global handler.
-        // Let's attach a global click listener for delegation to keep it simple.
+        // Floating logic handled by global click listener
     }
 
     private async startVerification() {
-        // Force Footer Color (Runtime Update)
         this.updateFooterContrast();
 
         if (this.isSolving || this.isSolved) return;
@@ -486,15 +528,36 @@ class ZenoWidget extends HTMLElement {
 
         try {
             this.zeno = new Zeno({ apiEndpoint: endpoint, siteKey });
-            const { token } = await this.zeno.solve();
 
+            // Set up progress callback
+            this.zeno.onProgress = (percent: number) => {
+                this.updateProgress(percent);
+            };
+
+            // Set up mode detection callback
+            this.zeno.onModeDetected = (mode: 'wasm' | 'js', wasmSupported: boolean) => {
+                this.isUsingWasm = mode === 'wasm';
+                if (!wasmSupported || mode === 'js') {
+                    this.showWasmBanner();
+                    // Show sublabel indicating JS mode
+                    if (this.sublabel) {
+                        this.sublabel.innerText = this.getAttribute('zeno-i18n-js-mode-label') || "Running in compatibility mode";
+                        this.sublabel.classList.add('visible');
+                    }
+                }
+            };
+
+            const { token } = await this.zeno.solve();
             this.handleSuccess(token);
         } catch (e: any) {
             console.error("Zeno Error:", e);
             this.setLabel(this.getAttribute('zeno-i18n-error-label') || "Error");
             this.container?.classList.remove('verifying');
             this.isSolving = false;
-            // Emit error event
+            this.hideWasmBanner();
+            if (this.sublabel) {
+                this.sublabel.classList.remove('visible');
+            }
             this.dispatchEvent(new CustomEvent('error', { detail: { message: e.toString() } }));
         }
     }
@@ -507,7 +570,12 @@ class ZenoWidget extends HTMLElement {
         this.setLabel(this.getAttribute('zeno-i18n-solved-label') || "Success!");
         this.container?.setAttribute('aria-checked', 'true');
 
-        // Create Hidden Input
+        // Hide banner and sublabel on success
+        this.hideWasmBanner();
+        if (this.sublabel) {
+            this.sublabel.classList.remove('visible');
+        }
+
         const formName = this.getAttribute('data-zeno-hidden-field-name') || 'zeno-token';
         let input = this.querySelector(`input[name="${formName}"]`) as HTMLInputElement;
         if (!input) {
@@ -518,17 +586,14 @@ class ZenoWidget extends HTMLElement {
         }
         input.value = token;
 
-        // Emit 'solve' event
         this.dispatchEvent(new CustomEvent('solve', {
             detail: { token },
             bubbles: true,
             composed: true
         }));
 
-        // Execute inline handler
         const onSolve = this.getAttribute('onsolve');
         if (onSolve) {
-            // Create a function context to execute string
             new Function('event', onSolve)(new CustomEvent('solve', { detail: { token } }));
         }
     }
@@ -549,13 +614,10 @@ document.addEventListener('click', (e) => {
         if (selector) {
             const widget = document.querySelector(selector) as HTMLElement;
             if (widget) {
-                // Toggle visibility logic
                 const isHidden = widget.style.display === 'none';
                 widget.style.display = isHidden ? 'inline-block' : 'none';
 
                 if (isHidden) {
-                    // Positioning logic
-                    // Simple PoC: Absolute positioning near trigger
                     const rect = trigger.getBoundingClientRect();
                     const position = trigger.getAttribute('zeno-floating-position') || 'bottom';
                     const offset = parseInt(trigger.getAttribute('zeno-floating-offset') || '10');
@@ -567,10 +629,8 @@ document.addEventListener('click', (e) => {
                         widget.style.top = `${rect.bottom + window.scrollY + offset}px`;
                         widget.style.left = `${rect.left + window.scrollX}px`;
                     }
-                    // Implement other positions as needed
                 }
             }
         }
     }
 });
-

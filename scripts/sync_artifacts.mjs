@@ -25,13 +25,22 @@ if (fs.existsSync(distClientDir)) {
     for (const file of files) {
         const src = path.join(distClientDir, file);
         const destBenchmark = path.join(benchmarkDir, file);
-        fs.copyFileSync(src, destBenchmark);
+
+        if (fs.statSync(src).isDirectory()) {
+            fs.cpSync(src, destBenchmark, { recursive: true });
+        } else {
+            fs.copyFileSync(src, destBenchmark);
+        }
 
         // Also sync to test/e2e/client
         const testClientDir = path.join(rootDir, 'test/e2e/client');
         if (fs.existsSync(testClientDir)) {
             const destTest = path.join(testClientDir, file);
-            fs.copyFileSync(src, destTest);
+            if (fs.statSync(src).isDirectory()) {
+                fs.cpSync(src, destTest, { recursive: true });
+            } else {
+                fs.copyFileSync(src, destTest);
+            }
         }
         console.log(`Synced ${file} to benchmark/ and test/e2e/client/`);
     }

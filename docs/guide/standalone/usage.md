@@ -102,7 +102,45 @@ Invalidates a session token manually (e.g. on user logout).
 }
 ```
 
-## 5. Configuration Impact
+```
+
+## 5. Client Widget & SDK
+
+### Widget Attributes
+The `<zeno-widget>` supports extensive customization via attributes:
+
+| Attribute | Description | Default |
+| :--- | :--- | :--- |
+| `zeno-i18n-human-label` | Main checkbox label | "I am human" |
+| `zeno-i18n-verifying-label` | Label during processing | "Verifying..." |
+| `zeno-i18n-solved-label` | Label on success | "Success!" |
+| `zeno-i18n-error-label` | Label on error | "Error" |
+| `zeno-i18n-wasm-banner` | Text for the red banner shown in JS fallback mode | "Enable WASM for significantly faster solving" |
+| `zeno-i18n-js-mode-label` | Sublabel shown in JS fallback mode | "Running in compatibility mode" |
+| `zeno-floating` | Selector for the element that triggers the popover (e.g. `#my-button`) | `null` |
+
+### Events
+The widget emits standard CustomEvents:
+
+| Event | Detail | Description |
+| :--- | :--- | :--- |
+| `solve` | `{ token: string }` | Emitted on successful verification. |
+| `error` | `{ message: string }` | Emitted if verification fails. |
+| `progress` | `{ percent: number }` | Emitted periodically (0-100) during JS solve or heavy WASM ops. |
+| `modedetected` | `{ mode: 'wasm' \| 'js', wasmSupported: boolean }` | Emitted when solver initializes. |
+
+### Configuration (Headless Mode)
+When using `new Zeno(config)`, you can pass additional options:
+
+```typescript
+const zeno = new Zeno({
+    apiEndpoint: '/api',
+    siteKey: '...',
+    forceJS: true // Optional: Force JS solver for testing (default: false)
+});
+```
+
+## 6. Configuration Impact
 
 The security and resource usage of Zeno are controlled by `graph_bits` (Space) and `vdf` (Time).
 

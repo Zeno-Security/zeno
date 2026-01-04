@@ -21,6 +21,7 @@ export default defineConfig({
         plugins: [
             wasm()
         ],
+        format: 'es',
         rollupOptions: {
             output: {
                 entryFileNames: 'zeno_worker.js',
