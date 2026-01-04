@@ -554,7 +554,10 @@ document.<span class="f">addEventListener</span>(<span class="s">'click'</span>,
     60%, 100% { <span class="cp">content</span>: <span class="cv">'...'</span>; }
 }`,
 
-            'js-html': `<span class="c">&lt;!-- Force JavaScript-only mode (no WASM) --&gt;</span>
+            'js-html': `<span class="c">&lt;!-- Include the Zeno library --&gt;</span>
+<span class="t">&lt;script</span> <span class="a">type</span>=<span class="v">"module"</span> <span class="a">src</span>=<span class="v">"https://cdn.jsdelivr.net/gh/zeno-security/zeno@latest/dist/client/zeno.min.js"</span><span class="t">&gt;&lt;/script&gt;</span>
+
+<span class="c">&lt;!-- Force JavaScript-only mode (no WASM) --&gt;</span>
 <span class="c">&lt;!-- Useful for environments where WASM is blocked --&gt;</span>
 
 <span class="t">&lt;zeno-widget</span>
