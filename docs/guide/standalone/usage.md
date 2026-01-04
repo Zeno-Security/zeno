@@ -144,6 +144,8 @@ The widget emits standard CustomEvents:
 When using `new Zeno(config)`, you can pass additional options:
 
 ```typescript
+import { Zeno } from './zeno.min.js'; // or from 'zeno' package
+
 const zeno = new Zeno({
     apiEndpoint: '/api',
     siteKey: '...',
