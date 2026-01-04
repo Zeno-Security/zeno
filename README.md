@@ -25,7 +25,7 @@ Attackers need 32GB RAM for 1,000 parallel threads.
 
 ## Demo
 
-Try the live demo: **[https://zeno.js.org/demo/](https://zeno.js.org/demo/)**
+Try the live demo: **[https://zeno.js.org/demo/](https://zeno.js.org/demo/)**, you can also try the SPEEDTEST: **[https://fast.kalman.co.il](https://fast.kalman.co.il/)**  [(REPO)](https://github.com/kaerez/speedtest/)
 
 ## Quick Start (Client)
 
