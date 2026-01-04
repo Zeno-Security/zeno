@@ -59,10 +59,7 @@ export class Zeno extends EventTarget {
             workerScriptUrl = scriptUrl.replace(/zeno(\.min)?\.js(\?.*)?$/, 'zeno_worker.js');
         }
 
-        // Apply cache busting
-        if (!isLocal && !workerScriptUrl.startsWith('blob:') && !workerScriptUrl.startsWith('data:')) {
-            workerScriptUrl += (workerScriptUrl.includes('?') ? '&' : '?') + 'v=' + Date.now();
-        }
+
 
         console.log("Zeno Worker Source:", workerScriptUrl);
 
