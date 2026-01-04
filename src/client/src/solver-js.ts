@@ -150,9 +150,8 @@ function sha256(data: Uint8Array): Uint8Array {
 
     // Pre-processing: adding padding bits
     const bitLen = BigInt(data.length * 8);
-    const padLen = ((data.length + 8) % 64 < 56)
-        ? 56 - (data.length + 8) % 64
-        : 120 - (data.length + 8) % 64;
+    const totalLen = data.length + 1 + 8;
+    const padLen = (64 - (totalLen % 64)) % 64;
 
     const padded = new Uint8Array(data.length + 1 + padLen + 8);
     padded.set(data);
