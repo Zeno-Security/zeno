@@ -21,7 +21,7 @@ if (!fs.existsSync(benchmarkDir)) {
 if (fs.existsSync(distClientDir)) {
     const files = fs.readdirSync(distClientDir);
     for (const file of files) {
-        if (!file.includes('.map')) { // Skip maps, but sync assets folder
+        if (!file.includes('.map') && file !== 'assets') { // Skip maps and assets folder
             const src = path.join(distClientDir, file);
 
             // Sync to docs/benchmark

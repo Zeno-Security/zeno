@@ -25,7 +25,8 @@ export default defineConfig({
         rollupOptions: {
             output: {
                 entryFileNames: 'zeno_worker.js',
-                assetFileNames: 'zeno.[ext]'
+                assetFileNames: 'zeno.[ext]',
+                inlineDynamicImports: true // Inline dependencies to avoid hashed chunks
             }
         }
     },
