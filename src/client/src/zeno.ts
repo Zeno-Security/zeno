@@ -646,7 +646,9 @@ class ZenoWidget extends HTMLElement {
 }
 
 // Register Component
-customElements.define('zeno-widget', ZenoWidget);
+if (!customElements.get('zeno-widget')) {
+    customElements.define('zeno-widget', ZenoWidget);
+}
 
 // Floating Mode Global Handler
 document.addEventListener('click', (e) => {
