@@ -260,6 +260,20 @@
             <h2>Advanced Settings</h2>
 
             <div class="modal-section">
+                <h3>Test Mode</h3>
+                <div class="setting-row">
+                    <label><input type="radio" name="cfg_mode" value="both" checked> <strong>WASM + JS
+                            (Default)</strong></label>
+                </div>
+                <div class="setting-row">
+                    <label><input type="radio" name="cfg_mode" value="wasm"> <strong>WASM Only</strong></label>
+                </div>
+                <div class="setting-row">
+                    <label><input type="radio" name="cfg_mode" value="js"> <strong>JS Only</strong></label>
+                </div>
+            </div>
+
+            <div class="modal-section">
                 <h3>Global Stop Criteria</h3>
                 <div class="setting-row">
                     <label>Max Time (ms)</label>
@@ -346,6 +360,7 @@
 
         // --- Config State (defaults per screenshot) ---
         const DEFAULT_CONFIG = {
+            mode: 'both', // 'both', 'wasm', 'js'
             limits: { time: 1500, mem: 320 },
             tests: { sanity: true, r1: true, r2: true, r3: true },
             r1: { start: 11, step: 1 },
@@ -387,6 +402,14 @@
         // --- UI Logic ---
 
         function uiToConfig() {
+            const modeRadios = document.getElementsByName('cfg_mode');
+            for (const r of modeRadios) {
+                if (r.checked) {
+                    CONFIG.mode = r.value;
+                    break;
+                }
+            }
+
             CONFIG.limits.time = parseInt(ui.maxTime.value) || 1500;
             CONFIG.limits.mem = parseInt(ui.maxMem.value) || 320;
 
@@ -406,6 +429,11 @@
         }
 
         function configToUi() {
+            const modeRadios = document.getElementsByName('cfg_mode');
+            for (const r of modeRadios) {
+                r.checked = (r.value === CONFIG.mode);
+            }
+
             ui.maxTime.value = CONFIG.limits.time;
             ui.maxMem.value = CONFIG.limits.mem;
             ui.sanity.checked = CONFIG.tests.sanity;
@@ -564,7 +592,12 @@
             stopRequested = false;
 
             const passedGB = [];
-            const modes = ['WASM', 'JS'];
+            const wasmSuccessSet = new Set(); // Stores "gb-vdf" strings for WASM successes
+
+            let modes = [];
+            if (CONFIG.mode === 'both') modes = ['WASM', 'JS'];
+            else if (CONFIG.mode === 'wasm') modes = ['WASM'];
+            else if (CONFIG.mode === 'js') modes = ['JS'];
 
             const LIMIT_TIME_MS = CONFIG.limits.time;
             const LIMIT_MEM_MB = CONFIG.limits.mem;
@@ -574,9 +607,12 @@
                     if (stopRequested) break;
 
                     const isForceJS = mode === 'JS';
-                    // Wider limits for JS? For now using same limits but tracking failures
 
                     addHeader(`--- Mode: ${mode} ---`);
+
+                    const checkWasmSuccess = (gb, vdf) => {
+                        return wasmSuccessSet.has(`${gb}-${vdf}`);
+                    };
 
                     // --- Sanity ---
                     if (CONFIG.tests.sanity && !stopRequested) {
@@ -584,6 +620,7 @@
                         let res = await solve(10, 100, isForceJS);
                         addRow('Sanity', mode, 10, 100, res.time.toFixed(0), res.mem.toFixed(2), res.error || 'OK');
                         if (res.error) throw new Error("Sanity failed: " + res.error);
+                        if (mode === 'WASM' && !res.error) wasmSuccessSet.add(`10-100`);
                     }
 
                     // --- Round 1: Graph Bits (G) ---
@@ -594,12 +631,34 @@
                             let res = await solve(gb, 100, isForceJS);
                             const r = addRow('R1: GB Ramp', mode, gb, 100, res.time.toFixed(0), res.mem.toFixed(2), res.error || 'OK');
 
-                            if (!res.error && res.time <= LIMIT_TIME_MS && res.mem <= LIMIT_MEM_MB) {
-                                if (mode === 'WASM') passedGB.push(gb); // Only use WASM passed graphs for combos?
-                            } else {
-                                log(`[${mode}] R1 Limit: GB ${gb} exceeded limits`);
-                                break;
+                            const exceeded = (res.time > LIMIT_TIME_MS || res.mem > LIMIT_MEM_MB);
+
+                            if (!res.error && !exceeded) {
+                                if (mode === 'WASM') {
+                                    passedGB.push(gb);
+                                    wasmSuccessSet.add(`${gb}-100`);
+                                }
                             }
+
+                            // Stop logic: Break if error OR if limits exceeded...
+                            // UNLESS (Symmetry Rule): We are in JS mode AND this specific test passed in WASM.
+                            // In that case, we permit it to run specifically to gather comparison data, even if slow.
+                            let shouldBreak = false;
+
+                            if (res.error) {
+                                shouldBreak = true;
+                            } else if (exceeded) {
+                                if (mode === 'JS' && checkWasmSuccess(gb, 100)) {
+                                    log(`[${mode}] R1 Limit: GB ${gb} exceeded limits but continuing (WASM parity)`);
+                                    shouldBreak = false;
+                                } else {
+                                    log(`[${mode}] R1 Limit: GB ${gb} exceeded limits`);
+                                    shouldBreak = true;
+                                }
+                            }
+
+                            if (shouldBreak) break;
+
                             gb += CONFIG.r1.step;
                         }
                     }
@@ -612,10 +671,28 @@
                             let res = await solve(10, diff, isForceJS);
                             const r = addRow('R2: VDF Ramp', mode, 10, diff, res.time.toFixed(0), res.mem.toFixed(2), res.error || 'OK');
 
-                            if (res.error || res.time > LIMIT_TIME_MS || res.mem > LIMIT_MEM_MB) {
-                                log(`[${mode}] R2 Limit: VDF ${diff} exceeded limits`);
-                                break;
+                            const exceeded = (res.time > LIMIT_TIME_MS || res.mem > LIMIT_MEM_MB);
+
+                            if (mode === 'WASM' && !res.error && !exceeded) {
+                                wasmSuccessSet.add(`10-${diff}`);
                             }
+
+                            let shouldBreak = false;
+
+                            if (res.error) {
+                                shouldBreak = true;
+                            } else if (exceeded) {
+                                if (mode === 'JS' && checkWasmSuccess(10, diff)) {
+                                    log(`[${mode}] R2 Limit: VDF ${diff} exceeded limits but continuing (WASM parity)`);
+                                    shouldBreak = false;
+                                } else {
+                                    log(`[${mode}] R2 Limit: VDF ${diff} exceeded limits`);
+                                    shouldBreak = true;
+                                }
+                            }
+
+                            if (shouldBreak) break;
+
                             diff += CONFIG.r2.step;
                         }
                     }
@@ -623,13 +700,11 @@
                     // --- Round 3: Combinations ---
                     if (CONFIG.tests.r3 && !stopRequested) {
                         let comboGBs = passedGB;
-                        // Note: If WASM failed earlier or was skipped, this might be empty.
-                        // For JS run, we probably want to re-test the same graphs WASM passed, or just re-ramp? 
-                        // Let's stick to testing graphs that WASM could handle, otherwise JS will definitely fail.
 
                         if (mode === 'JS' && comboGBs.length === 0 && CONFIG.r1.start) {
                             // Fallback if R1 didn't populate (e.g. only testing JS)
-                            comboGBs = [10];
+                            // Or use R1 start if available
+                            comboGBs = [CONFIG.r1.start];
                         }
 
                         if (comboGBs.length > 0) {
@@ -641,7 +716,12 @@
                                 let d = CONFIG.r3.vStart;
 
                                 while (!stopRequested) {
-                                    if (d > maxSafeVDF) {
+                                    // Normally we prune if d > maxSafeVDF for previous graphs.
+                                    // But for Symmetry, we might want to force it? 
+                                    // Actually, standard pruning is probably fine unless the user intentionally wants full grid.
+                                    // Let's stick to standard behavior but allow the loop to continue if WASM passed it.
+
+                                    if (d > maxSafeVDF && !(mode === 'JS' && checkWasmSuccess(g, d))) {
                                         log(`[${mode}] R3: Pruning VDFs > ${maxSafeVDF} for GB=${g}`);
                                         break;
                                     }
@@ -650,10 +730,51 @@
                                     let res = await solve(g, d, isForceJS);
                                     const r = addRow('R3: Combo', mode, g, d, res.time.toFixed(0), res.mem.toFixed(2), res.error || 'OK');
 
-                                    if (res.error || res.time > LIMIT_TIME_MS || res.mem > LIMIT_MEM_MB) {
-                                        maxSafeVDF = d;
-                                        break;
+                                    const exceeded = (res.time > LIMIT_TIME_MS || res.mem > LIMIT_MEM_MB);
+
+                                    if (mode === 'WASM' && !res.error && !exceeded) {
+                                        wasmSuccessSet.add(`${g}-${d}`);
                                     }
+
+                                    let shouldBreak = false;
+
+                                    if (res.error) {
+                                        shouldBreak = true;
+                                    } else if (exceeded) {
+                                        if (mode === 'JS' && checkWasmSuccess(g, d)) {
+                                            // This is key: Even if JS is super slow, if WASM did it, we show the slow result.
+                                            // We do NOT break here, effectively creating a "Slow" result in the table.
+                                            // However, if we don't break, we continue incrementing VDF.
+                                            // If VDF=1000 took 5 seconds (WASM=0.1s), do we want to try VDF=2000? 
+                                            // Probably not, unless WASM successfully did VDF=2000.
+
+                                            // So, we Check the NEXT step. If the CURRENT step was WASM-OK, we don't break.
+                                            // Actually, the loop condition is `while`.
+                                            // If we `break`, we stop incrementing VDF for this GB.
+                                            // We enable `shouldBreak = false` -> keep going.
+
+                                            // We should only keep going if the *next* potential VDF is also in `wasmSuccessSet`?
+                                            // Or simpler: Just rely on the checkWasmSuccess(g, d) of the *current* iteration to suppress failure?
+                                            // Yes: We just survived a slow/heavy test because WASM did it.
+                                            // We try the next one. If the next one WASM *didn't* do (or wasn't checked), we'll hit this block again with checkWasmSuccess=false and break.
+                                            // Perfect.
+
+                                            // But wait, maxSafeVDF logic might prune future GBs.
+                                            // We should Update maxSafeVDF only if we are NOT in special parity mode.
+                                            // If we are in parity mode (slow but allowed), we probably shouldn't poison maxSafeVDF for other graphs?
+                                            // Actually, maxSafeVDF is usually "If GB=10 failed at VDF=5000, GB=11 will surely fail at 5000".
+                                            // If GB=10 failed (but allowed), we don't want to set maxSafeVDF=5000.
+
+                                            log(`[${mode}] R3 Limit: Combo GB=${g} VDF=${d} exceeded limits but continuing (WASM parity)`);
+                                            shouldBreak = false;
+
+                                        } else {
+                                            maxSafeVDF = d;
+                                            shouldBreak = true;
+                                        }
+                                    }
+
+                                    if (shouldBreak) break;
 
                                     d += CONFIG.r3.vStep;
                                 }
@@ -665,7 +786,7 @@
                 log("Suite Completed/Stopped.");
                 statusEl.textContent = stopRequested ? "Stopped" : "Benchmark Complete";
                 console.log("--- FINAL RESULTS ---");
-                console.table(resultsData);
+                console.table(resultsData); // table output
 
             } catch (e) {
                 if (e.message === "Stopped by user") {
