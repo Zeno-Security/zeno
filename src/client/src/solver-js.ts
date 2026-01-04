@@ -230,39 +230,37 @@ function rotr32(x: number, n: number): number {
 // BigInt Utilities (Matching Rust's num-bigint)
 // ============================================================================
 
+// BigInt to Signed Bytes BE (Two's Complement) - Matches Rust num_bigint
 function bigintToSignedBytesBE(n: bigint): Uint8Array {
     if (n === 0n) return new Uint8Array([0]);
 
-    const negative = n < 0n;
-    let abs = negative ? -n : n;
-
-    const bytes: number[] = [];
-    while (abs > 0n) {
-        bytes.unshift(Number(abs & 0xFFn));
-        abs >>= 8n;
-    }
-
-    // Two's complement for negative numbers
-    if (negative) {
-        // Invert all bits and add 1
-        let carry = 1;
-        for (let i = bytes.length - 1; i >= 0; i--) {
-            const val = (~bytes[i] & 0xFF) + carry;
-            bytes[i] = val & 0xFF;
-            carry = val >> 8;
+    if (n > 0n) {
+        let hex = n.toString(16);
+        if (hex.length % 2 === 1) hex = '0' + hex;
+        // Check MSB to ensure positive interpretation (prepend 00 if MSB has high bit set)
+        if (parseInt(hex.substring(0, 2), 16) & 0x80) {
+            hex = '00' + hex;
         }
-        // Ensure high bit is set (negative)
-        if ((bytes[0] & 0x80) === 0) {
-            bytes.unshift(0xFF);
-        }
+        return hexToBytes(hex);
     } else {
-        // Ensure high bit is clear (positive)
-        if ((bytes[0] & 0x80) !== 0) {
-            bytes.unshift(0x00);
+        // Negative: Find minimum byte width to represent n in 2's complement
+        let byteCount = 1;
+        while (true) {
+            // Min value for byteCount bits: -2^(8*byteCount - 1)
+            const min = -(1n << (BigInt(byteCount * 8) - 1n));
+            if (n >= min) break;
+            byteCount++;
         }
-    }
 
-    return new Uint8Array(bytes);
+        // Calculate 2's complement
+        const width = 8n * BigInt(byteCount);
+        const val = (1n << width) + n; // 2^width - |n|
+
+        let hex = val.toString(16);
+        // Pad to correct length
+        while (hex.length < byteCount * 2) hex = '0' + hex;
+        return hexToBytes(hex);
+    }
 }
 
 function bigintFromSignedBytesBE(bytes: Uint8Array): bigint {
