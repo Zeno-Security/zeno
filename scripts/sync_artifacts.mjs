@@ -48,29 +48,33 @@ if (fs.existsSync(distClientDir)) {
     console.warn("Warning: dist/client does not exist. Run 'npm run build:client' first.");
 }
 
-// 3. Generate Docs Benchmark (Standalone with CDN)
+// 3. Generate Docs Benchmark (Standalone with LOCAL assets for stability)
 const docsDir = path.join(rootDir, 'docs');
 const destDocsBenchmark = path.join(docsDir, 'benchmark-test.html');
-const cdnUrl = 'https://cdn.jsdelivr.net/gh/zeno-security/zeno/dist/client/zeno.min.js';
+
+console.log("Syncing assets to docs/ for live testing...");
+if (fs.existsSync(distClientDir)) {
+    const files = fs.readdirSync(distClientDir);
+    for (const file of files) {
+        if (!file.includes('.map')) { // Skip maps
+            const src = path.join(distClientDir, file);
+            const dest = path.join(docsDir, file);
+            if (fs.statSync(src).isDirectory()) {
+                fs.cpSync(src, dest, { recursive: true });
+            } else {
+                fs.copyFileSync(src, dest);
+            }
+        }
+    }
+}
 
 const benchmarkFile = path.join(benchmarkDir, 'benchmark.html');
 if (fs.existsSync(benchmarkFile)) {
     let content = fs.readFileSync(benchmarkFile, 'utf-8');
-
-    // Replace import to use CDN
-    // Existing benchmark.html uses './zeno.min.js' or similar. 
-    // We replace usage of purely local paths with the CDN URL.
-
-    // Replace explicit full-file imports
-    content = content.replace(/src="\.\/zeno\.js"/g, `src="${cdnUrl}"`);
-    content = content.replace(/src="\.\/zeno\.min\.js"/g, `src="${cdnUrl}"`);
-
-    // Replace JS module imports
-    content = content.replace(/from\s+['"]\.\/zeno\.js['"]/g, `from '${cdnUrl}'`);
-    content = content.replace(/from\s+['"]\.\/zeno\.min\.js['"]/g, `from '${cdnUrl}'`);
-
+    // Ensure we use local import
+    // (Content is likely already using ./zeno.min.js, so we just write it)
     fs.writeFileSync(destDocsBenchmark, content);
-    console.log(`Generated ${destDocsBenchmark} with CDN link.`);
+    console.log(`Generated ${destDocsBenchmark} with LOCAL links.`);
 } else {
     console.error("Error: benchmark/benchmark.html source not found.");
 }
