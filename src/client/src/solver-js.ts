@@ -459,7 +459,8 @@ function formCompose(f1: Form, f2: Form): Form {
     const wCoeff = v2;
 
     const term1 = vCoeff * (b1 - b2);
-    const term2 = wCoeff * c2;
+    // Fixed: term1 uses (b1-b2) which is 2*(s-b2). So term2 must also be scaled by 2.
+    const term2 = wCoeff * c2 * 2n;
     const kVal = term1 - term2;
 
     const modVal = (2n * a1) / n;

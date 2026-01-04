@@ -38,7 +38,7 @@ const DEFAULT_CONFIG: SiteConfig = {
     allowed_referers: null,
     vdf: 450, // Updated Default (~2-3s)
     graph_bits: 18, // Primary Defense: 18 bits
-    challenge_ttl: 60,
+    challenge_ttl: 180,
     token_ttl: 3600,
     token_reuse: true,
     rate_limit_ip_min: 60,

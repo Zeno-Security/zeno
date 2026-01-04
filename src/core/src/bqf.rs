@@ -159,7 +159,9 @@ impl Form {
         let w_coeff = v2;
         
         let term1 = &v_coeff * (b1 - b2);
-        let term2 = &w_coeff * c2;
+        // Fixed: term1 uses (b1-b2)=2*(s-b2). Logically derived from Cohen 5.4.7 requires 2*X.
+        // term1 is 2*v*(s-b2). term2 must be 2*w*c2.
+        let term2 = &w_coeff * c2 * BigInt::from(2);
         let k_val = term1 - term2;
         
         let two = BigInt::from(2);
