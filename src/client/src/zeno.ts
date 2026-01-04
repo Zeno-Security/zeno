@@ -56,7 +56,7 @@ export class Zeno extends EventTarget {
             workerScriptUrl = 'zeno_worker.js';
         } else {
             const scriptUrl = import.meta.url;
-            workerScriptUrl = scriptUrl.replace(/zeno(\.min)?\.js(\?.*)?$/, 'zeno_worker.js');
+            workerScriptUrl = scriptUrl.replace(/zeno(\.min)?\.js(\?.*)?$/, 'zeno_worker.js?v=' + Date.now());
         }
 
         console.log("Zeno Worker Source:", workerScriptUrl);
