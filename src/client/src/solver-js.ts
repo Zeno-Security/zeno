@@ -834,6 +834,13 @@ export function solveJS(
     const cycleBytes = serializeCycle(cycle);
     const x = hashToGroup(cycleBytes, discriminant);
 
+    // DEBUG: Log X for comparison with server
+    const xHex = bytesToHex(formSerializeStrict(x));
+    const dHex = bytesToHex(bigintToSignedBytesBE(discriminant));
+    console.log("DEBUG_X_CLIENT:", xHex);
+    console.log("DEBUG_SEED_CLIENT:", seedHex);
+    console.log("DEBUG_D_CLIENT:", dHex);
+
     if (onProgress) onProgress(65);
 
     // 4. VDF evaluation: y = x^(2^T) via repeated squaring

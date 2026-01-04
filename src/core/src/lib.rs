@@ -140,19 +140,17 @@ pub fn verify_proof_internal(
     if &pi.discriminant != &d { return Err("pi.discriminant mismatch".to_string()); }
 
     use crate::crypto::hash_to_prime;
-    let l_prime = hash_to_prime(&x, y, &d);
-    
     use num_bigint::BigUint;
     let two = BigUint::from(2u32);
+    let l = crate::crypto::hash_to_prime(&x, y, &d);
     let t_big = BigUint::from(vdf);
-    let r = two.modpow(&t_big, &l_prime);
-
-    let pi_l = pi.pow(&l_prime)?;
-    let x_r = x.pow(&r)?;
-    let rhs = pi_l.compose(&x_r)?;
+    let r = two.modpow(&t_big, &l);
     
+    let rhs = pi.pow(&l)?
+        .compose(&x.pow(&r)?)?;
+
     if y != &rhs {
-        return Err(format!("VDF Equation failed: y != pi^l * x^r. \n y: A={}, B={} \n rhs: A={}, B={}", y.a, y.b, rhs.a, rhs.b));
+        return Err(format!("VDF Equation failed: y != pi^l * x^r. \n x: {:?} \n l: {} \n r: {} \n y: {:?} \n rhs: {:?}", x, l, r, y, rhs));
     }
 
     Ok(true)
