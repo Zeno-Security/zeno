@@ -40,8 +40,8 @@ function X(n, t, e) {
   i.writeU64(2n * t);
   const s = i.finish() & e, r = new q(n);
   r.writeU64(2n * t + 1n);
-  const l = r.finish() & e;
-  return [s, l];
+  const c = r.finish() & e;
+  return [s, c];
 }
 const Y = new Uint32Array([
   1116352408,
@@ -110,28 +110,28 @@ const Y = new Uint32Array([
   3329325298
 ]);
 function C(n) {
-  let t = 1779033703, e = 3144134277, i = 1013904242, s = 2773480762, r = 1359893119, l = 2600822924, c = 528734635, a = 1541459225;
-  const m = BigInt(n.length * 8), u = (64 - (n.length + 1 + 8) % 64) % 64, f = new Uint8Array(n.length + 1 + u + 8);
-  f.set(n), f[n.length] = 128;
-  for (let d = 0; d < 8; d++)
-    f[f.length - 1 - d] = Number(m >> BigInt(d * 8) & 0xFFn);
+  let t = 1779033703, e = 3144134277, i = 1013904242, s = 2773480762, r = 1359893119, c = 2600822924, l = 528734635, a = 1541459225;
+  const v = BigInt(n.length * 8), f = (64 - (n.length + 1 + 8) % 64) % 64, u = new Uint8Array(n.length + 1 + f + 8);
+  u.set(n), u[n.length] = 128;
+  for (let m = 0; m < 8; m++)
+    u[u.length - 1 - m] = Number(v >> BigInt(m * 8) & 0xFFn);
   const o = new Uint32Array(64);
-  for (let d = 0; d < f.length; d += 64) {
-    for (let h = 0; h < 16; h++)
-      o[h] = f[d + h * 4] << 24 | f[d + h * 4 + 1] << 16 | f[d + h * 4 + 2] << 8 | f[d + h * 4 + 3];
-    for (let h = 16; h < 64; h++) {
-      const k = (S(o[h - 15], 7) ^ S(o[h - 15], 18) ^ o[h - 15] >>> 3) >>> 0, x = (S(o[h - 2], 17) ^ S(o[h - 2], 19) ^ o[h - 2] >>> 10) >>> 0;
-      o[h] = o[h - 16] + k + o[h - 7] + x >>> 0;
+  for (let m = 0; m < u.length; m += 64) {
+    for (let d = 0; d < 16; d++)
+      o[d] = u[m + d * 4] << 24 | u[m + d * 4 + 1] << 16 | u[m + d * 4 + 2] << 8 | u[m + d * 4 + 3];
+    for (let d = 16; d < 64; d++) {
+      const R = (S(o[d - 15], 7) ^ S(o[d - 15], 18) ^ o[d - 15] >>> 3) >>> 0, k = (S(o[d - 2], 17) ^ S(o[d - 2], 19) ^ o[d - 2] >>> 10) >>> 0;
+      o[d] = o[d - 16] + R + o[d - 7] + k >>> 0;
     }
-    let y = t, p = e, U = i, B = s, b = r, I = l, F = c, M = a;
-    for (let h = 0; h < 64; h++) {
-      const k = (S(b, 6) ^ S(b, 11) ^ S(b, 25)) >>> 0, x = (b & I ^ ~b & F) >>> 0, E = M + k + x + Y[h] + o[h] >>> 0, _ = (S(y, 2) ^ S(y, 13) ^ S(y, 22)) >>> 0, z = (y & p ^ y & U ^ p & U) >>> 0, Q = _ + z >>> 0;
-      M = F, F = I, I = b, b = B + E >>> 0, B = U, U = p, p = y, y = E + Q >>> 0;
+    let y = t, p = e, U = i, A = s, b = r, I = c, F = l, M = a;
+    for (let d = 0; d < 64; d++) {
+      const R = (S(b, 6) ^ S(b, 11) ^ S(b, 25)) >>> 0, k = (b & I ^ ~b & F) >>> 0, E = M + R + k + Y[d] + o[d] >>> 0, _ = (S(y, 2) ^ S(y, 13) ^ S(y, 22)) >>> 0, z = (y & p ^ y & U ^ p & U) >>> 0, Q = _ + z >>> 0;
+      M = F, F = I, I = b, b = A + E >>> 0, A = U, U = p, p = y, y = E + Q >>> 0;
     }
-    t = t + y >>> 0, e = e + p >>> 0, i = i + U >>> 0, s = s + B >>> 0, r = r + b >>> 0, l = l + I >>> 0, c = c + F >>> 0, a = a + M >>> 0;
+    t = t + y >>> 0, e = e + p >>> 0, i = i + U >>> 0, s = s + A >>> 0, r = r + b >>> 0, c = c + I >>> 0, l = l + F >>> 0, a = a + M >>> 0;
   }
-  const g = new Uint8Array(32), w = new DataView(g.buffer);
-  return w.setUint32(0, t, !1), w.setUint32(4, e, !1), w.setUint32(8, i, !1), w.setUint32(12, s, !1), w.setUint32(16, r, !1), w.setUint32(20, l, !1), w.setUint32(24, c, !1), w.setUint32(28, a, !1), g;
+  const w = new Uint8Array(32), g = new DataView(w.buffer);
+  return g.setUint32(0, t, !1), g.setUint32(4, e, !1), g.setUint32(8, i, !1), g.setUint32(12, s, !1), g.setUint32(16, r, !1), g.setUint32(20, c, !1), g.setUint32(24, l, !1), g.setUint32(28, a, !1), w;
 }
 function S(n, t) {
   return (n >>> t | n << 32 - t) >>> 0;
@@ -170,8 +170,8 @@ function D(n) {
   const t = 2n * n.a;
   let e = (n.b % t + t) % t;
   e > n.a ? e -= t : e <= -n.a && (e += t);
-  const s = e * e - n.discriminant, r = 4n * n.a, l = s / r;
-  return { a: n.a, b: e, c: l, discriminant: n.discriminant };
+  const s = e * e - n.discriminant, r = 4n * n.a, c = s / r;
+  return { a: n.a, b: e, c, discriminant: n.discriminant };
 }
 function O(n) {
   let t = D(n);
@@ -201,11 +201,11 @@ function V(n, t) {
   return { gcd: e, x: s, y: i - n / t * s };
 }
 function K(n, t) {
-  const e = n.a, i = t.a, s = n.b, r = t.b, l = t.c, c = (s + r) / 2n, a = V(e, i), m = a.gcd, v = a.y, u = V(m, c), f = u.gcd, o = u.x, g = u.y, w = o * v, d = g, y = w * (s - r), p = d * l, U = y - p, B = 2n * e / f;
-  let b = U % B;
-  b < 0n && (b += B);
-  const I = b, F = f * f, M = e * i / F, k = i / f * I, x = r + k, E = x * x - n.discriminant, _ = M * 4n, z = E / _;
-  return O({ a: M, b: x, c: z, discriminant: n.discriminant });
+  const e = n.a, i = t.a, s = n.b, r = t.b, c = t.c, l = (s + r) / 2n, a = V(e, i), v = a.gcd, h = a.y, f = V(v, l), u = f.gcd, o = f.x, w = f.y, g = o * h, m = w, y = g * (s - r), p = m * c, U = y - p, A = 2n * e / u;
+  let b = U % A;
+  b < 0n && (b += A);
+  const I = b, F = u * u, M = e * i / F, R = i / u * I, k = r + R, E = k * k - n.discriminant, _ = M * 4n, z = E / _;
+  return O({ a: M, b: k, c: z, discriminant: n.discriminant });
 }
 function G(n) {
   return K(n, n);
@@ -216,7 +216,7 @@ function tt(n, t) {
     s & 1n && (e = K(e, i)), i = G(i), s >>= 1n;
   return e;
 }
-function A(n, t, e) {
+function B(n, t, e) {
   let i = 1n;
   for (n = (n % e + e) % e; t > 0n; )
     t & 1n && (i = i * n % e), t >>= 1n, n = n * n % e;
@@ -232,48 +232,55 @@ function Z(n, t) {
   let e = 0n, i = n - 1n;
   for (; i % 2n === 0n; )
     i /= 2n, e++;
-  const s = [2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n, 37n];
-  for (let r = 0; r < Math.min(t, s.length); r++) {
-    const l = s[r];
-    if (l >= n)
+  for (let s = 0; s < t; s++) {
+    const r = n - 3n, c = r.toString(2).length;
+    let l = 0n;
+    for (; ; ) {
+      let h = 0n;
+      for (let f = 0; f < c; f += 32) {
+        const u = Math.floor(Math.random() * 4294967295);
+        h = h << 32n | BigInt(u);
+      }
+      if (l = h % r + 2n, l < n - 1n)
+        break;
+    }
+    let a = B(l, i, n);
+    if (a === 1n || a === n - 1n)
       continue;
-    let c = A(l, i, n);
-    if (c === 1n || c === n - 1n)
-      continue;
-    let a = !0;
-    for (let m = 0n; m < e - 1n; m++)
-      if (c = A(c, 2n, n), c === n - 1n) {
-        a = !1;
+    let v = !0;
+    for (let h = 0n; h < e - 1n; h++)
+      if (a = B(a, 2n, n), a === n - 1n) {
+        v = !1;
         break;
       }
-    if (a)
+    if (v)
       return !1;
   }
   return !0;
 }
 function nt(n, t) {
-  if (A(n, (t - 1n) / 2n, t) !== 1n)
+  if (B(n, (t - 1n) / 2n, t) !== 1n)
     return 0n;
   if (t % 4n === 3n)
-    return A(n, (t + 1n) / 4n, t);
+    return B(n, (t + 1n) / 4n, t);
   let e = 0n, i = t - 1n;
   for (; i % 2n === 0n; )
     i /= 2n, e++;
   let s = 2n;
-  for (; A(s, (t - 1n) / 2n, t) === 1n; )
+  for (; B(s, (t - 1n) / 2n, t) === 1n; )
     s++;
-  let r = A(s, i, t), l = A(n, (i + 1n) / 2n, t), c = A(n, i, t), a = e;
-  for (; c !== 1n; ) {
-    let m = c, v = 0n;
-    for (; m !== 1n; )
-      if (m = m * m % t, v++, v === a)
+  let r = B(s, i, t), c = B(n, (i + 1n) / 2n, t), l = B(n, i, t), a = e;
+  for (; l !== 1n; ) {
+    let v = l, h = 0n;
+    for (; v !== 1n; )
+      if (v = v * v % t, h++, h === a)
         return 0n;
-    let u = r;
-    for (let f = 0n; f < a - v - 1n; f++)
-      u = u * u % t;
-    a = v, r = u * u % t, c = c * r % t, l = l * u % t;
+    let f = r;
+    for (let u = 0n; u < a - h - 1n; u++)
+      f = f * f % t;
+    a = h, r = f * f % t, l = l * r % t, c = c * f % t;
   }
-  return l;
+  return c;
 }
 function et(n, t) {
   const e = C(n);
@@ -284,29 +291,29 @@ function et(n, t) {
       continue;
     }
     if (Z(i, 40)) {
-      const f = A(t, (i - 1n) / 2n, i), o = (1n % i + i) % i;
-      if (f === o || f === 1n)
+      const u = B(t, (i - 1n) / 2n, i), o = (1n % i + i) % i;
+      if (u === o || u === 1n)
         break;
     }
     i++;
   }
   const s = i, r = (t % s + s) % s;
-  let l = nt(r, s);
-  const c = l % 2n === 0n ? s - l : l, a = c * c, m = s * 4n, u = (a - t) / m;
-  return O({ a: s, b: c, c: u, discriminant: t });
+  let c = nt(r, s);
+  const l = c % 2n === 0n ? s - c : c, a = l * l, v = s * 4n, f = (a - t) / v;
+  return O({ a: s, b: l, c: f, discriminant: t });
 }
 function st(n, t, e) {
-  const i = T(n), s = T(t), r = N(e), l = new Uint8Array(i.length + s.length + r.length);
-  l.set(i, 0), l.set(s, i.length), l.set(r, i.length + s.length);
-  const c = C(l);
+  const i = T(n), s = T(t), r = N(e), c = new Uint8Array(i.length + s.length + r.length);
+  c.set(i, 0), c.set(s, i.length), c.set(r, i.length + s.length);
+  const l = C(c);
   let a = 0n;
   for (; ; ) {
-    const m = new Uint8Array(8);
-    new DataView(m.buffer).setBigUint64(0, a, !1);
-    const u = new Uint8Array(c.length + 8);
-    u.set(c, 0), u.set(m, c.length);
-    const f = C(u);
-    let o = j(f.slice(0, 16));
+    const v = new Uint8Array(8);
+    new DataView(v.buffer).setBigUint64(0, a, !1);
+    const f = new Uint8Array(l.length + 8);
+    f.set(l, 0), f.set(v, l.length);
+    const u = C(f);
+    let o = j(u.slice(0, 16));
     if (o |= 1n, Z(o, 40))
       return o;
     a++;
@@ -321,60 +328,60 @@ function it(n) {
 function ot(n, t, e) {
   if (n.length < 16)
     throw new Error("Seed too short");
-  const i = n.slice(0, 16), s = 1n << BigInt(t + 2), r = (1n << BigInt(t)) - 1n, l = 1 << t, c = new Array(l);
-  for (let o = 0; o < l; o++)
-    c[o] = [];
-  const a = Number(s), m = Math.floor(a / 100);
+  const i = n.slice(0, 16), s = 1n << BigInt(t + 2), r = (1n << BigInt(t)) - 1n, c = 1 << t, l = new Array(c);
+  for (let o = 0; o < c; o++)
+    l[o] = [];
+  const a = Number(s), v = Math.floor(a / 100);
   for (let o = 0; o < a; o++) {
-    const [g, w] = X(i, BigInt(o), r), d = Number(g), y = Number(w);
-    d !== y && (c[d].push([y, o]), c[y].push([d, o]), e && o % m === 0 && e(Math.floor(o / a * 50)));
+    const [w, g] = X(i, BigInt(o), r), m = Number(w), y = Number(g);
+    m !== y && (l[m].push([y, o]), l[y].push([m, o]), e && o % v === 0 && e(Math.floor(o / a * 50)));
   }
-  const v = /* @__PURE__ */ new Set(), u = [];
-  function f(o, g, w) {
-    v.add(o);
-    for (const [d, y] of c[o]) {
-      if (d === g && w === 41)
-        return [...u, y];
-      if (!v.has(d) && w < 42) {
-        u.push(y);
-        const p = f(d, g, w + 1);
+  const h = /* @__PURE__ */ new Set(), f = [];
+  function u(o, w, g) {
+    h.add(o);
+    for (const [m, y] of l[o]) {
+      if (m === w && g === 41)
+        return [...f, y];
+      if (!h.has(m) && g < 42) {
+        f.push(y);
+        const p = u(m, w, g + 1);
         if (p)
           return p;
-        u.pop();
+        f.pop();
       }
     }
-    return v.delete(o), null;
+    return h.delete(o), null;
   }
-  for (let o = 0; o < l; o++) {
-    if (c[o].length === 0)
+  for (let o = 0; o < c; o++) {
+    if (l[o].length === 0)
       continue;
-    e && o % 1e3 === 0 && e(50 + Math.floor(o / l * 50)), v.clear(), u.length = 0;
-    const g = f(o, o, 0);
-    if (g)
-      return e && e(100), g;
+    e && o % 1e3 === 0 && e(50 + Math.floor(o / c * 50)), h.clear(), f.length = 0;
+    const w = u(o, o, 0);
+    if (w)
+      return e && e(100), w;
   }
   return null;
 }
 function rt(n, t, e, i, s) {
-  const r = L(n), l = L(t), a = -j(l), v = ot(r, i, s ? (F) => s(Math.floor(F * 0.6)) : void 0);
-  if (!v)
+  const r = L(n), c = L(t), a = -j(c), h = ot(r, i, s ? (F) => s(Math.floor(F * 0.6)) : void 0);
+  if (!h)
     throw new Error("No 42-cycle found (try different seed)");
   s && s(60);
-  const u = it(v), f = et(u, a);
+  const f = it(h), u = et(f, a);
   s && s(65);
-  let o = f;
-  const g = 65, d = 90 - g;
+  let o = u;
+  const w = 65, m = 90 - w;
   for (let F = 0; F < e; F++)
     if (o = G(o), s && F % 100 === 0) {
-      const M = F / e * d;
-      s(Math.floor(g + M));
+      const M = F / e * m;
+      s(Math.floor(w + M));
     }
   s && s(90);
-  const y = st(f, o, a), U = ct(e) / y, B = tt(f, U);
+  const y = st(u, o, a), U = ct(e) / y, A = tt(u, U);
   s && s(100);
-  const b = T(o), I = T(B);
+  const b = T(o), I = T(A);
   return {
-    cycle: v,
+    cycle: h,
     y: H(b),
     pi: H(I),
     memory_bytes: (1 << i) * 1200
@@ -417,14 +424,14 @@ function lt() {
   }
   return !1;
 }
-let $ = null, W = !1, J = !0, R = !1;
+let $ = null, W = !1, J = !0, x = !1;
 try {
-  R = lt();
+  x = lt();
 } catch (n) {
-  console.warn("Failed to check WASM support, defaulting to false:", n), R = !1;
+  console.warn("Failed to check WASM support, defaulting to false:", n), x = !1;
 }
 async function at(n) {
-  if (!R)
+  if (!x)
     return console.warn("WebAssembly not supported in this environment. Using JS fallback."), !1;
   try {
     const t = (await import("./assets/zeno_core-26a7c4c3.js")).default;
@@ -437,50 +444,50 @@ self.onmessage = async (n) => {
   const { type: t, challenge: e, wasm_url: i, force_js: s } = n.data;
   if (t === "SOLVE")
     try {
-      const r = s || !R;
+      const r = s || !x;
       !r && !W && (J = await at(i));
-      const l = J && W && !r;
+      const c = J && W && !r;
       self.postMessage({
         type: "STATUS",
-        mode: l ? "wasm" : "js",
-        wasmSupported: R
-      }), console.log(`Starting Zeno Solver (${l ? "WASM" : "JS fallback"})...`);
-      let c, a = 0;
-      if (l)
-        c = $.solve_wasm(
+        mode: c ? "wasm" : "js",
+        wasmSupported: x
+      }), console.log(`Starting Zeno Solver (${c ? "WASM" : "JS fallback"})...`);
+      let l, a = 0;
+      if (c)
+        l = $.solve_wasm(
           e.seed,
           e.discriminant,
           BigInt(e.vdf),
           e.graph_bits
-        ), a = c.memory_bytes || 0;
+        ), a = l.memory_bytes || 0;
       else {
-        const m = (v) => {
+        const v = (h) => {
           if (self.performance?.memory?.usedJSHeapSize) {
-            const u = self.performance.memory.usedJSHeapSize;
-            u > a && (a = u);
+            const f = self.performance.memory.usedJSHeapSize;
+            f > a && (a = f);
           }
-          self.postMessage({ type: "PROGRESS", percent: v });
+          self.postMessage({ type: "PROGRESS", percent: h });
         };
-        c = rt(
+        l = rt(
           e.seed,
           e.discriminant,
           e.vdf,
           e.graph_bits,
-          m
-        ), a === 0 && c.memory_bytes && (a = c.memory_bytes);
+          v
+        ), a === 0 && l.memory_bytes && (a = l.memory_bytes);
       }
       self.postMessage({
         type: "SOLVED",
-        payload: c,
+        payload: l,
         memory: a,
-        mode: l ? "wasm" : "js"
+        mode: c ? "wasm" : "js"
       });
     } catch (r) {
       console.error("Solver Error:", r), self.postMessage({ type: "ERROR", error: r.toString() });
     }
   t === "CHECK_WASM" && self.postMessage({
     type: "WASM_STATUS",
-    supported: R,
+    supported: x,
     initialized: W
   });
 };
