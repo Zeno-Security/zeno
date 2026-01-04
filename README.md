@@ -54,12 +54,11 @@ document.querySelector('zeno-widget').addEventListener('solve', (e) => {
 
 | Threat | Recommended Config | Time | Memory |
 | :--- | :--- | :--- | :--- |
-| Script Bots | GB=13, VDF=100 | ~0.9s | 2 MB |
-| Bot Farms | GB=15, VDF=150 | ~1.3s | 5 MB |
+| Script Bots | GB=13, VDF=100 | ~0.2s | 2 MB |
+| Bot Farms | GB=15, VDF=150 | ~0.4s | 5 MB |
 | GPU Attacks | GB=17, VDF=100 | ~0.5s | 16 MB |
 | **ASIC/GPU (Default)** | **GB=18, VDF=300** | **~1.6s** | **32 MB** |
-| High-Value Actions | GB=18, VDF=300 | ~2.7s | 32 MB |
-| Maximum Security | GB=19, VDF=200 | ~2.6s | 62 MB |
+| Maximum Security | GB=19, VDF=200 | ~2.5s | 62 MB |
 
 ## Server Installation
 
