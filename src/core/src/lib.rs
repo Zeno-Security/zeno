@@ -140,13 +140,6 @@ pub fn verify_proof_internal(
     if &y.discriminant != &d { return Err("y.discriminant mismatch".to_string()); }
     if &pi.discriminant != &d { return Err("pi.discriminant mismatch".to_string()); }
 
-    // Recompute seed for debug logging
-    let mut hasher = sha2::Sha256::new();
-    use sha2::Digest;
-    hasher.update(&cycle_bytes);
-    let seed_hash = hasher.finalize();
-    let seed_hex_debug = hex::encode(seed_hash);
-
     use crate::crypto::hash_to_prime;
     use num_bigint::BigUint;
     let two = BigUint::from(2u32);
@@ -158,7 +151,7 @@ pub fn verify_proof_internal(
         .compose(&x.pow(&r)?)?;
 
     if y != &rhs {
-        return Err(format!("VDF Equation failed: y != pi^l * x^r. \n cycle: {:?} \n seed: {} \n x: {:?} \n l: {} \n r: {} \n y: {:?} \n rhs: {:?}", cycle, seed_hex_debug, x, l, r, y, rhs));
+        return Err("VDF Equation failed: y != pi^l * x^r".to_string());
     }
 
     Ok(true)
