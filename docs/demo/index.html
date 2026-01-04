@@ -433,7 +433,10 @@ widget.<span class="f">addEventListener</span>(<span class="s">'error'</span>, (
     <span class="cp">margin</span>: <span class="cv">16px 0</span>;
 }`,
 
-            'float-html': `<span class="c">&lt;!-- Trigger button with zeno-floating attribute --&gt;</span>
+            'float-html': `<span class="c">&lt;!-- Include the Zeno library --&gt;</span>
+<span class="t">&lt;script</span> <span class="a">type</span>=<span class="v">"module"</span> <span class="a">src</span>=<span class="v">"https://cdn.jsdelivr.net/gh/zeno-security/zeno@latest/dist/client/zeno.min.js"</span><span class="t">&gt;&lt;/script&gt;</span>
+
+<span class="c">&lt;!-- Trigger button with zeno-floating attribute --&gt;</span>
 <span class="t">&lt;button</span> <span class="a">zeno-floating</span>=<span class="v">"#my-widget"</span><span class="t">&gt;</span>Verify Me<span class="t">&lt;/button&gt;</span>
 
 <span class="c">&lt;!-- Hidden widget - shown when button clicked --&gt;</span>
