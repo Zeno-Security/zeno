@@ -32,6 +32,17 @@ Zeno operates on a **Proof-of-Work (PoW)** model to verify human presence withou
 
 4.  **Verification**:
     *   Your backend sends the token to `/api/verify`.
+    *   **Payload**:
+        ```json
+        POST /api/verify
+        {
+          "site_key": "YOUR_SITE_KEY",
+          "token": "TOKEN_FROM_CLIENT",
+          "single": true
+        }
+        ```
+        *   `single: true`: **Burn** token (Strict Single-Use).
+        *   `single: false`: **Keep** token (Multi-use if `token_reuse=true`).
     *   Zeno Server checks R2 for the token's existence and expiry.
 
 5.  **Deletion (Optional)**:
