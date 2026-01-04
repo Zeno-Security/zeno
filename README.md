@@ -111,7 +111,7 @@ Zeno consists of three main components:
 
 ### Benchmarks
 
-Run the benchmark yourself: **[docs/benchmark-test.html](https://zeno.js.org/benchmark-test.html)**
+Run the benchmark yourself: **[docs/benchmark/benchmark.html](https://zeno.js.org/benchmark/benchmark.html)**
 
 ### Full Build
 

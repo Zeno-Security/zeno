@@ -20,7 +20,7 @@ Zeno performance is determined by two independent physical constraints:
 
 ## 2. Benchmark Data (M1 Max, WASM, December 2025)
 
-Run the benchmark yourself: [**Run Benchmark**](../benchmark-test.html)
+Run the benchmark yourself: [**Run Benchmark**](../../benchmark/benchmark.html)
 
 ### 2.1 Round 1: Memory Scaling (Graph Bits)
 *Fixed VDF = 100*
