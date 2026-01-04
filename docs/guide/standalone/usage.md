@@ -7,24 +7,42 @@
 
   SPDX-License-Identifier: PolyForm-Strict-1.0.0
 -->
-# Usage & API Endpoints
+# Usage Guide (Standalone)
 
-The Zeno Server exposes a REST API for challenge generation, solution redemption, and token verification.
+This guide covers how to act as a **Zeno Server** (generating challenges, validating tokens) in your own backend.
 
-## Endpoints
+## 1. Installation
 
-### 1. `POST /api/challenge`
-
-Generates a new cryptographic challenge.
-
-**Request:**
-```json
-{
-  "site_key": "UUID-HERE"
-}
+```bash
+npm install zeno-server
+# OR
+yarn add zeno-server
 ```
 
-**Response:**
+## 2. Generate Challenge (`GET /api/challenge`)
+
+The client requests a challenge (PoW parameters) from your server.
+
+```javascript
+import { ZenoServer } from 'zeno-server';
+
+const zeno = new ZenoServer({
+    secretKey: process.env.ZENO_SECRET_KEY
+});
+
+app.get('/api/challenge', async (req, res) => {
+    // 1. Generate challenge
+    const challenge = await zeno.createChallenge({
+        siteKey: req.query.site_key,
+        ip: req.ip
+    });
+
+    // 2. Return to client
+    res.json(challenge);
+});
+```
+
+**Response Format:**
 ```json
 {
   "challenge_id": "UUID",
@@ -39,113 +57,68 @@ Generates a new cryptographic challenge.
 
 ### 2. `POST /api/redeem`
 
-Redeems a solved challenge for a session token.
+The client submits a solution. You verify it and issue a **Zeno Token**.
 
-**Request:**
-```json
-{
-  "site_key": "UUID-HERE",
-  "challenge_id": "UUID-FROM-STEP-1",
-  "solution": {
-    "cycle": [1, 2, ...42],
-    "y": "hex...",
-    "pi": "hex..."
-  }
-}
+```javascript
+app.post('/api/redeem', async (req, res) => {
+    const { challenge_id, solution, site_key } = req.body;
+
+    try {
+        // 1. Verify Solution (Heavy CPU)
+        const token = await zeno.redeemChallenge({
+            challengeId: challenge_id,
+            solution: solution,
+            siteKey: site_key
+        });
+
+        // 2. Return signed token
+        res.json({ token });
+
+    } catch (err) {
+        res.status(400).json({ error: "Invalid solution" });
+    }
+});
 ```
 
-**Response:**
-```json
-{
-  "token": "UUID-TOKEN",
-  "expires_at": 1234567890
-}
+## 3. Protect Routes (`/api/protected`)
+
+Your sensitive endpoints (e.g., login, signup) require a valid Zeno Token.
+
+```javascript
+app.post('/login', async (req, res) => {
+    const token = req.headers['x-zeno-token'];
+
+    // 1. Verify Token (Fast)
+    const isValid = await zeno.verifyToken(token);
+
+    if (!isValid) {
+        return res.status(403).json({ error: "Access Denied" });
+    }
+
+    // 2. Proceed with login logic...
+});
 ```
 
-### 3. `POST /api/verify`
+## 4. Middleware Integration
 
-Verifies if a token is valid. This is the endpoint your backend calls.
+For Express, Hono, etc., consider using middleware to simplify route protection.
 
-**Request:**
-```json
-{
-  "site_key": "UUID-HERE",
-  "token": "UUID-TOKEN",
-  "single": false
-}
-```
-*   `single` (optional): If `true`, the token will be deleted after verification (Burn on Verify).
+**Express Example:**
+```javascript
+import { zenoMiddleware } from 'zeno-server/express';
 
-**Response:**
-```json
-{
-  "valid": true
-}
+app.use('/api/protected', zenoMiddleware({
+    secretKey: '...',
+    onError: (res) => res.status(403).send('Bot detected')
+}));
 ```
 
-### 4. `POST /api/delete`
+## 5. Client Integration
 
-Invalidates a session token manually (e.g. on user logout).
+The client-side widget handles solving automatically.
 
-**Request:**
-```json
-{
-    "site_key": "UUID-HERE",
-    "token": "UUID-TOKEN"
-}
-```
-
-**Response:**
-```json
-{
-    "deleted": true
-}
-```
-
-```
-
-## 5. Client Widget & SDK
-
-### Widget Attributes
-The `<zeno-widget>` supports extensive customization via attributes:
-
-### Internationalization (i18n)
-You can customize the text labels using attributes or CSS variables (useful for styling/theming).
-
-**Attributes (Standard):**
-- `zeno-i18n-human-label`: Default "I am human"
-- `zeno-i18n-verifying-label`: Default "Verifying..."
-- `zeno-i18n-solved-label`: Default "Success!"
-- `zeno-i18n-error-label`: Default "Error"
-
-**CSS Variables (Styling/Content):**
-- `--zeno-i18n-wasm-banner`: Text for the red banner in JS fallback mode.
-  - *Example:* `--zeno-i18n-wasm-banner: "Please enable WASM"`
-- `--zeno-i18n-js-mode-label`: Text for the compatibility mode sublabel.
-  - *Example:* `--zeno-i18n-js-mode-label: "Slow Mode Active"`
-
-> **Note:** CSS variable values must be quoted strings if passing text content via proper CSS syntax, though the widget creates robustness by stripping quotes if present.
-
-| Attribute | Description | Default |
-| :--- | :--- | :--- |
-| `zeno-floating` | Selector for the element that triggers the popover (e.g. `#my-button`) | `null` |
-
-### Events
-The widget emits standard CustomEvents:
-
-| Event | Detail | Description |
-| :--- | :--- | :--- |
-| `solve` | `{ token: string }` | Emitted on successful verification. |
-| `error` | `{ message: string }` | Emitted if verification fails. |
-| `progress` | `{ percent: number }` | Emitted periodically (0-100) during both WASM and JS execution. |
-| `modedetected` | `{ mode: 'wasm' \| 'js', wasmSupported: boolean }` | Emitted when solver initializes. |
-
-### Configuration (Headless Mode)
-When using `new Zeno(config)`, you can pass additional options:
-
-```typescript
-import { Zeno } from './zeno.min.js'; // or from 'zeno' package
-
+```javascript
+// Initialize
 const zeno = new Zeno({
     apiEndpoint: '/api',
     siteKey: '...',
@@ -153,11 +126,6 @@ const zeno = new Zeno({
 });
 ```
 
-## 6. Configuration Impact
+## 6. Performance & Tuning
 
 See [Benchmarks](../../guide/benchmark.md) for detailed performance analysis, tuning recommendations, and hardware benchmark data.
-| M1/M2 Mac | 1× | 0.9s |
-| Modern Desktop | 1.2× | 1.1s |
-| iPhone 14+ | 1.5× | 1.4s |
-| Mid-range Android | 2× | 1.8s |
-| Low-end Mobile | 3-4× | 2.7-3.6s |
