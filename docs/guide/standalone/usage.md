@@ -137,7 +137,7 @@ The widget emits standard CustomEvents:
 | :--- | :--- | :--- |
 | `solve` | `{ token: string }` | Emitted on successful verification. |
 | `error` | `{ message: string }` | Emitted if verification fails. |
-| `progress` | `{ percent: number }` | Emitted periodically (0-100) during JS solve or heavy WASM ops. |
+| `progress` | `{ percent: number }` | Emitted periodically (0-100) during both WASM and JS execution. |
 | `modedetected` | `{ mode: 'wasm' \| 'js', wasmSupported: boolean }` | Emitted when solver initializes. |
 
 ### Configuration (Headless Mode)

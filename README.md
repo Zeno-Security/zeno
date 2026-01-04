@@ -19,7 +19,7 @@ Attackers need 32GB RAM for 1,000 parallel threads.
   - **Floating**: Corner popup.
   - **Invisible**: Background verification for seamless UX.
 - **Universal Compatibility**:
-  - **Pure JS Fallback**: Automatically activates on devices without WebAssembly support.
+  - **Pure JS Fallback**: Automatically activates on devices without WebAssembly support. Full feature parity including progress reporting.
   - **Force Mode**: Option to strictly enforce JS or WASM for testing.
 - **Internationalization (i18n)**: Fully customizable strings and styling via CSS variables.
 
