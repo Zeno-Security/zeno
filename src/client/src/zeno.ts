@@ -676,3 +676,6 @@ document.addEventListener('click', (e) => {
         }
     }
 });
+
+// Expose Zeno to window for non-module usage (e.g. Demo inline scripts)
+(window as any).Zeno = Zeno;
