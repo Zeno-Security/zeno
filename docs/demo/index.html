@@ -408,6 +408,7 @@ widget.<span class="f">addEventListener</span>(<span class="s">'solve'</span>, (
     console.<span class="f">log</span>(<span class="s">'Verification token:'</span>, token);
 
     <span class="c">// Send token to your server for validation</span>
+    <span class="c">// Payload: { "token": token, "site_key": "YOUR_KEY", "single": true }</span>
     <span class="f">submitForm</span>(token);
 });
 
@@ -522,6 +523,7 @@ document.<span class="f">addEventListener</span>(<span class="s">'click'</span>,
         console.<span class="f">log</span>(<span class="s">'Token:'</span>, token);
 
         <span class="c">// Submit token to your server</span>
+        <span class="c">// POST /api/verify { "token": token, "site_key": "...", "single": true }</span>
         <span class="k">return</span> token;
     } <span class="k">catch</span> (error) {
         console.<span class="f">error</span>(<span class="s">'Verification failed:'</span>, error);
@@ -576,6 +578,7 @@ document.<span class="f">addEventListener</span>(<span class="s">'click'</span>,
     console.<span class="f">log</span>(<span class="s">'JS Mode Token:'</span>, token);
 
     <span class="c">// Token works identically to WASM mode</span>
+    <span class="c">// Verify with: { "token": token, "site_key": "...", "single": true }</span>
     <span class="f">submitToServer</span>(token);
 }
 
