@@ -25,7 +25,7 @@ bucket_name = "zeno-bans-day"
 
 # Root package.json now handles install
 [vars]
-graph_bits = "22" # Global override
+graph_bits = "18" # Global override
 # Constants for keys
 KEY_HEADERS_STRICT = "00000000-0000-0000-0000-000000000002"
 KEY_HEADERS_MIXED = "00000000-0000-0000-0000-000000000003"
