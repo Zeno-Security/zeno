@@ -15,50 +15,210 @@ use siphasher::sip::SipHasher24;
 use std::collections::{HashMap, HashSet};
 use std::hash::Hasher;
 
-/// Generates a proof for the Zeno challenge.
-/// 1. Finds a 42-cycle in the Cuckatoo graph.
-/// 2. Calculates the VDF output y = x^(2^T).
-/// 3. Generates the VDF proof pi.
+// --- Stateful Solver ---
+
+pub enum SolverState {
+    BuildingGraph { edge_index: u64, limit: u64 },
+    FindingCycle { start_node_idx: usize },
+    VDF { current_iter: u64, total_iter: u64 },
+    Proof,
+    Done,
+}
+
+pub struct ZenoSolver {
+    // Configuration
+    pub seed: Vec<u8>,
+    pub discriminant: BigInt,
+    pub vdf_iters: u64,
+    pub graph_bits: u32,
+
+    // Internal State
+    pub state: SolverState,
+    
+    // Graph State
+    adj: Vec<Vec<(u32, u32)>>,
+    sip_key: [u8; 16],
+    mask: u64,
+
+    // Results
+    cycle: Option<Vec<u32>>,
+    x: Option<Form>,
+    y: Option<Form>,
+    pi: Option<Form>,
+}
+
+pub enum StepResult {
+    Progress(f32), // 0.0 to 100.0
+    Done(Vec<u32>, Form, Form),
+    Error(String),
+}
+
+impl ZenoSolver {
+    pub fn new(seed_hex: &str, discriminant_hex: &str, vdf_iters: u64, graph_bits: u32) -> Result<Self, String> {
+        let seed = hex::decode(seed_hex).map_err(|e| e.to_string())?;
+        
+        let d_bytes = hex::decode(discriminant_hex).map_err(|e| e.to_string())?;
+        let d_val = BigInt::from_bytes_be(Sign::Plus, &d_bytes);
+        let discriminant = -d_val;
+
+        let sip_key = if seed.len() >= 16 {
+            let mut k = [0u8; 16];
+            k.copy_from_slice(&seed[0..16]);
+            k
+        } else {
+            return Err("Seed too short".to_string());
+        };
+
+        let num_nodes = (1 << graph_bits) as usize;
+        let num_edges = 1u64 << (graph_bits + 2);
+
+        Ok(Self {
+            seed,
+            discriminant,
+            vdf_iters,
+            graph_bits,
+            state: SolverState::BuildingGraph { edge_index: 0, limit: num_edges },
+            adj: vec![Vec::new(); num_nodes],
+            sip_key,
+            mask: (1u64 << graph_bits) - 1,
+            cycle: None,
+            x: None,
+            y: None,
+            pi: None,
+        })
+    }
+
+    pub fn step(&mut self, steps: usize) -> StepResult {
+        match &mut self.state {
+            SolverState::BuildingGraph { edge_index, limit } => {
+                let end = std::cmp::min(*edge_index + steps as u64, *limit);
+                
+                for i in *edge_index..end {
+                    let (u, v) = generate_edge(&self.sip_key, i, self.mask);
+                    let u = u as u32;
+                    let v = v as u32;
+                    if u == v { continue; }
+                    
+                    self.adj[u as usize].push((v, i as u32));
+                    self.adj[v as usize].push((u, i as u32));
+                }
+                *edge_index = end;
+                
+                let progress = (*edge_index as f32 / *limit as f32) * 50.0; // 0-50%
+                
+                if *edge_index >= *limit {
+                    self.state = SolverState::FindingCycle { start_node_idx: 0 };
+                }
+                
+                StepResult::Progress(progress)
+            },
+            SolverState::FindingCycle { start_node_idx } => {
+                let limit = self.adj.len();
+                let chunk = steps * 10; // Process more nodes per step as DFS start check is fast
+                let end = std::cmp::min(*start_node_idx + chunk, limit);
+                
+                for i in *start_node_idx..end {
+                    if self.adj[i].is_empty() { continue; }
+                    
+                    if let Some(cycle) = dfs_cycle(
+                        i as u32,
+                        i as u32,
+                        &self.adj,
+                        &mut HashSet::new(),
+                        &mut Vec::new()
+                    ) {
+                        self.cycle = Some(cycle.clone());
+                        
+                        // Proceed to VDF
+                        let cycle_bytes = crate::serialize_cycle(&cycle);
+                        match hash_to_group(&cycle_bytes, &self.discriminant) {
+                            Ok(x) => {
+                                self.x = Some(x.clone());
+                                self.y = Some(x); // Initialize y = x
+                                self.state = SolverState::VDF { current_iter: 0, total_iter: self.vdf_iters };
+                                return StepResult::Progress(60.0);
+                            },
+                            Err(e) => return StepResult::Error(e),
+                        }
+                    }
+                }
+                *start_node_idx = end;
+                
+                if *start_node_idx >= limit {
+                    return StepResult::Error("No 42-cycle found".to_string());
+                }
+                
+                let progress = 50.0 + (*start_node_idx as f32 / limit as f32) * 10.0; // 50-60%
+                StepResult::Progress(progress)
+            },
+            SolverState::VDF { current_iter, total_iter } => {
+                if let Some(y) = &mut self.y {
+                    let end = std::cmp::min(*current_iter + steps as u64, *total_iter);
+                    for _ in *current_iter..end {
+                        match square_form(y) {
+                            Ok(new_y) => *y = new_y,
+                            Err(e) => return StepResult::Error(e),
+                        }
+                    }
+                    *current_iter = end;
+                    
+                    let progress = 60.0 + (*current_iter as f32 / *total_iter as f32) * 30.0; // 60-90%
+                    
+                    if *current_iter >= *total_iter {
+                        self.state = SolverState::Proof;
+                    }
+                    StepResult::Progress(progress)
+                } else {
+                    StepResult::Error("Msg: State error, y is missing".to_string())
+                }
+            },
+            SolverState::Proof => {
+                if let (Some(x), Some(y)) = (&self.x, &self.y) {
+                    let l_prime = hash_to_prime(x, y, &self.discriminant);
+                    let exponent = compute_power_of_two(self.vdf_iters);
+                    let (q, _) = exponent.div_rem(&l_prime);
+                    match x.pow(&q) {
+                        Ok(pi) => {
+                             self.pi = Some(pi.clone());
+                             self.state = SolverState::Done;
+                             if let Some(cycle) = &self.cycle {
+                                 StepResult::Done(cycle.clone(), y.clone(), pi)
+                             } else {
+                                 StepResult::Error("Missing cycle".to_string())
+                             }
+                        },
+                        Err(e) => StepResult::Error(e)
+                    }
+                } else {
+                    StepResult::Error("Missing x or y".to_string())
+                }
+            },
+            SolverState::Done => {
+                 if let (Some(cycle), Some(y), Some(pi)) = (&self.cycle, &self.y, &self.pi) {
+                     StepResult::Done(cycle.clone(), y.clone(), pi.clone())
+                 } else {
+                     StepResult::Error("Already done but missing results".to_string())
+                 }
+            }
+        }
+    }
+}
+
+// Keep original stateless functions for compatibility (if needed) or tests
 pub fn solve_challenge(
     seed_hex: &str,
     discriminant_hex: &str,
     vdf: u64,
     graph_bits: u32,
 ) -> Result<(Vec<u32>, Form, Form), String> {
-    // 1. Parse Inputs
-    let seed = hex::decode(seed_hex).map_err(|e| e.to_string())?;
-    // Discriminant is passed as Hex (Magnitude). D is negative for class groups.
-    let d_bytes = hex::decode(discriminant_hex).map_err(|e| e.to_string())?;
-    let d_val = BigInt::from_bytes_be(Sign::Plus, &d_bytes);
-    let discriminant = -d_val; // D = -U
-
-    // 2. Find Cycle
-    let cycle = find_cycle(&seed, graph_bits)?;
-
-    // 3. Serialize Cycle & Hash to Group
-    let cycle_bytes = crate::serialize_cycle(&cycle);
-    let x = hash_to_group(&cycle_bytes, &discriminant)?;
-
-    // 4. VDF Evaluation (y = x^(2^T))
-    // x^(2^T) means squaring x, T times.
-    let mut y = x.clone();
-    for _ in 0..vdf {
-         y = square_form(&y)?;
+    let mut solver = ZenoSolver::new(seed_hex, discriminant_hex, vdf, graph_bits)?;
+    loop {
+        match solver.step(10000) { // Large step for sync
+            StepResult::Progress(_) => continue,
+            StepResult::Done(c, y, pi) => return Ok((c, y, pi)),
+            StepResult::Error(e) => return Err(e),
+        }
     }
-
-    // 5. Generate Proof (Wesolowski)
-    // l = HashToPrime(x, y)
-    let l_prime = hash_to_prime(&x, &y, &discriminant);
-    
-    // q = 2^T / l
-    // FIX: Compute 2^T without u32 truncation
-    let exponent = compute_power_of_two(vdf);
-    let (q, _) = exponent.div_rem(&l_prime);
-    
-    // pi = x^q
-    let pi = x.pow(&q)?;
-
-    Ok((cycle, y, pi))
 }
 
 /// Compute 2^n for large n without overflow
@@ -143,10 +303,8 @@ pub fn verify_cycle(seed_hex: &str, cycle: &[u32], graph_bits: u32) -> bool {
     visited.len() == 42
 }
 
-fn find_cycle(seed: &[u8], graph_bits: u32) -> Result<Vec<u32>, String> {
-    // Optimized Dense Solver for Cuckatoo Cycle
-    // Uses Vec<Vec<_>> instead of HashMap for memory efficiency on dense graphs.
-
+pub fn find_cycle_stateless(seed: &[u8], graph_bits: u32) -> Result<Vec<u32>, String> {
+    // Legacy helper if needed, essentially reimplements BuildingGraph phase
     let sip_key = if seed.len() >= 16 {
         let mut k = [0u8; 16];
         k.copy_from_slice(&seed[0..16]);
@@ -261,7 +419,7 @@ mod tests {
             seed[0..8].copy_from_slice(&seed_val.to_be_bytes());
             seed_val += 1;
 
-            let res = find_cycle(&seed, 10);
+            let res = find_cycle_stateless(&seed, 10);
             if let Ok(cycle) = res {
                 assert_eq!(cycle.len(), 42);
                 let seed_hex = hex::encode(seed);

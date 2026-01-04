@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: PolyForm-Strict-1.0.0
  */
 
-class Z {
+class et {
   v0;
   v1;
   v2;
@@ -17,18 +17,18 @@ class Z {
   bufLen = 0;
   totalLen = 0;
   constructor(t) {
-    const e = this.readU64LE(t, 0), s = this.readU64LE(t, 8);
-    this.v0 = e ^ 0x736f6d6570736575n, this.v1 = s ^ 0x646f72616e646f6dn, this.v2 = e ^ 0x6c7967656e657261n, this.v3 = s ^ 0x7465646279746573n;
+    const n = this.readU64LE(t, 0), s = this.readU64LE(t, 8);
+    this.v0 = n ^ 0x736f6d6570736575n, this.v1 = s ^ 0x646f72616e646f6dn, this.v2 = n ^ 0x6c7967656e657261n, this.v3 = s ^ 0x7465646279746573n;
   }
-  readU64LE(t, e) {
+  readU64LE(t, n) {
     let s = 0n;
-    for (let i = 0; i < 8; i++)
-      s |= BigInt(t[e + i]) << BigInt(i * 8);
+    for (let r = 0; r < 8; r++)
+      s |= BigInt(t[n + r]) << BigInt(r * 8);
     return s;
   }
-  rotl(t, e) {
+  rotl(t, n) {
     const s = 0xFFFFFFFFFFFFFFFFn;
-    return (t << BigInt(e) | t >> BigInt(64 - e)) & s;
+    return (t << BigInt(n) | t >> BigInt(64 - n)) & s;
   }
   sipRound() {
     const t = 0xFFFFFFFFFFFFFFFFn;
@@ -45,15 +45,15 @@ class Z {
     return this.v3 ^= t, this.sipRound(), this.sipRound(), this.v0 ^= t, this.v2 ^= 0xFFn, this.sipRound(), this.sipRound(), this.sipRound(), this.sipRound(), this.v0 ^ this.v1 ^ this.v2 ^ this.v3;
   }
 }
-function dt(n, t, e) {
-  const s = new Z(n);
+function yt(e, t, n) {
+  const s = new et(e);
   s.writeU64(2n * t);
-  const i = s.finish() & e, l = new Z(n);
-  l.writeU64(2n * t + 1n);
-  const o = l.finish() & e;
-  return [i, o];
+  const r = s.finish() & n, o = new et(e);
+  o.writeU64(2n * t + 1n);
+  const i = o.finish() & n;
+  return [r, i];
 }
-const bt = new Uint32Array([
+const mt = new Uint32Array([
   1116352408,
   1899447441,
   3049323471,
@@ -119,133 +119,133 @@ const bt = new Uint32Array([
   3204031479,
   3329325298
 ]);
-function P(n) {
-  let t = 1779033703, e = 3144134277, s = 1013904242, i = 2773480762, l = 1359893119, o = 2600822924, r = 528734635, c = 1541459225;
-  const b = BigInt(n.length * 8), h = (64 - (n.length + 1 + 8) % 64) % 64, f = new Uint8Array(n.length + 1 + h + 8);
-  f.set(n), f[n.length] = 128;
-  for (let w = 0; w < 8; w++)
-    f[f.length - 1 - w] = Number(b >> BigInt(w * 8) & 0xFFn);
+function Y(e) {
+  let t = 1779033703, n = 3144134277, s = 1013904242, r = 2773480762, o = 1359893119, i = 2600822924, c = 528734635, l = 1541459225;
+  const _ = BigInt(e.length * 8), d = (64 - (e.length + 1 + 8) % 64) % 64, u = new Uint8Array(e.length + 1 + d + 8);
+  u.set(e), u[e.length] = 128;
+  for (let h = 0; h < 8; h++)
+    u[u.length - 1 - h] = Number(_ >> BigInt(h * 8) & 0xFFn);
   const a = new Uint32Array(64);
-  for (let w = 0; w < f.length; w += 64) {
-    for (let u = 0; u < 16; u++)
-      a[u] = f[w + u * 4] << 24 | f[w + u * 4 + 1] << 16 | f[w + u * 4 + 2] << 8 | f[w + u * 4 + 3];
-    for (let u = 16; u < 64; u++) {
-      const I = (F(a[u - 15], 7) ^ F(a[u - 15], 18) ^ a[u - 15] >>> 3) >>> 0, M = (F(a[u - 2], 17) ^ F(a[u - 2], 19) ^ a[u - 2] >>> 10) >>> 0;
-      a[u] = a[u - 16] + I + a[u - 7] + M >>> 0;
+  for (let h = 0; h < u.length; h += 64) {
+    for (let b = 0; b < 16; b++)
+      a[b] = u[h + b * 4] << 24 | u[h + b * 4 + 1] << 16 | u[h + b * 4 + 2] << 8 | u[h + b * 4 + 3];
+    for (let b = 16; b < 64; b++) {
+      const M = (F(a[b - 15], 7) ^ F(a[b - 15], 18) ^ a[b - 15] >>> 3) >>> 0, R = (F(a[b - 2], 17) ^ F(a[b - 2], 19) ^ a[b - 2] >>> 10) >>> 0;
+      a[b] = a[b - 16] + M + a[b - 7] + R >>> 0;
     }
-    let _ = t, p = e, A = s, W = i, v = l, E = o, B = r, T = c;
-    for (let u = 0; u < 64; u++) {
-      const I = (F(v, 6) ^ F(v, 11) ^ F(v, 25)) >>> 0, M = (v & E ^ ~v & B) >>> 0, C = T + I + M + bt[u] + a[u] >>> 0, J = (F(_, 2) ^ F(_, 13) ^ F(_, 22)) >>> 0, G = (_ & p ^ _ & A ^ p & A) >>> 0, ht = J + G >>> 0;
-      T = B, B = E, E = v, v = W + C >>> 0, W = A, A = p, p = _, _ = C + ht >>> 0;
+    let y = t, S = n, A = s, W = r, v = o, B = i, x = c, I = l;
+    for (let b = 0; b < 64; b++) {
+      const M = (F(v, 6) ^ F(v, 11) ^ F(v, 25)) >>> 0, R = (v & B ^ ~v & x) >>> 0, N = I + M + R + mt[b] + a[b] >>> 0, P = (F(y, 2) ^ F(y, 13) ^ F(y, 22)) >>> 0, K = (y & S ^ y & A ^ S & A) >>> 0, gt = P + K >>> 0;
+      I = x, x = B, B = v, v = W + N >>> 0, W = A, A = S, S = y, y = N + gt >>> 0;
     }
-    t = t + _ >>> 0, e = e + p >>> 0, s = s + A >>> 0, i = i + W >>> 0, l = l + v >>> 0, o = o + E >>> 0, r = r + B >>> 0, c = c + T >>> 0;
+    t = t + y >>> 0, n = n + S >>> 0, s = s + A >>> 0, r = r + W >>> 0, o = o + v >>> 0, i = i + B >>> 0, c = c + x >>> 0, l = l + I >>> 0;
   }
-  const m = new Uint8Array(32), y = new DataView(m.buffer);
-  return y.setUint32(0, t, !1), y.setUint32(4, e, !1), y.setUint32(8, s, !1), y.setUint32(12, i, !1), y.setUint32(16, l, !1), y.setUint32(20, o, !1), y.setUint32(24, r, !1), y.setUint32(28, c, !1), m;
+  const m = new Uint8Array(32), g = new DataView(m.buffer);
+  return g.setUint32(0, t, !1), g.setUint32(4, n, !1), g.setUint32(8, s, !1), g.setUint32(12, r, !1), g.setUint32(16, o, !1), g.setUint32(20, i, !1), g.setUint32(24, c, !1), g.setUint32(28, l, !1), m;
 }
-function F(n, t) {
-  return (n >>> t | n << 32 - t) >>> 0;
+function F(e, t) {
+  return (e >>> t | e << 32 - t) >>> 0;
 }
-function q(n) {
-  if (n === 0n)
+function $(e) {
+  if (e === 0n)
     return new Uint8Array([0]);
-  if (n > 0n) {
-    let t = n.toString(16);
-    return t.length % 2 === 1 && (t = "0" + t), parseInt(t.substring(0, 2), 16) & 128 && (t = "00" + t), H(t);
+  if (e > 0n) {
+    let t = e.toString(16);
+    return t.length % 2 === 1 && (t = "0" + t), parseInt(t.substring(0, 2), 16) & 128 && (t = "00" + t), G(t);
   } else {
     let t = 1;
     for (; ; ) {
-      const l = -(1n << BigInt(t * 8) - 1n);
-      if (n >= l)
+      const o = -(1n << BigInt(t * 8) - 1n);
+      if (e >= o)
         break;
       t++;
     }
-    let i = ((1n << 8n * BigInt(t)) + n).toString(16);
-    for (; i.length < t * 2; )
-      i = "0" + i;
-    return H(i);
+    let r = ((1n << 8n * BigInt(t)) + e).toString(16);
+    for (; r.length < t * 2; )
+      r = "0" + r;
+    return G(r);
   }
 }
-function Y(n) {
+function tt(e) {
   let t = 0n;
-  for (const e of n)
-    t = t << 8n | BigInt(e);
+  for (const n of e)
+    t = t << 8n | BigInt(n);
   return t;
 }
-function O(n) {
-  const t = q(n.a), e = q(n.b), s = new Uint8Array(2 + t.length + 2 + e.length), i = new DataView(s.buffer);
-  return i.setUint16(0, t.length, !1), s.set(t, 2), i.setUint16(2 + t.length, e.length, !1), s.set(e, 4 + t.length), s;
+function j(e) {
+  const t = $(e.a), n = $(e.b), s = new Uint8Array(2 + t.length + 2 + n.length), r = new DataView(s.buffer);
+  return r.setUint16(0, t.length, !1), s.set(t, 2), r.setUint16(2 + t.length, n.length, !1), s.set(n, 4 + t.length), s;
 }
-function $(n) {
-  const t = 2n * n.a;
-  let e = (n.b % t + t) % t;
-  e > n.a ? e -= t : e <= -n.a && (e += t);
-  const i = e * e - n.discriminant, l = 4n * n.a, o = i / l;
-  return { a: n.a, b: e, c: o, discriminant: n.discriminant };
+function nt(e) {
+  const t = 2n * e.a;
+  let n = (e.b % t + t) % t;
+  n > e.a ? n -= t : n <= -e.a && (n += t);
+  const r = n * n - e.discriminant, o = 4n * e.a, i = r / o;
+  return { a: e.a, b: n, c: i, discriminant: e.discriminant };
 }
-function st(n) {
-  let t = $(n);
+function lt(e) {
+  let t = nt(e);
   for (; ; )
     if (t.a > t.c) {
-      const e = t.a;
+      const n = t.a;
       t = {
         a: t.c,
         b: -t.b,
-        c: e,
+        c: n,
         discriminant: t.discriminant
-      }, t = $(t);
+      }, t = nt(t);
     } else {
       t.a === t.c && t.b < 0n && (t = { ...t, b: -t.b });
       break;
     }
   return t;
 }
-function wt(n) {
-  const t = 1n, e = (t - n) / 4n;
-  return { a: t, b: t, c: e, discriminant: n };
+function pt(e) {
+  const t = 1n, n = (t - e) / 4n;
+  return { a: t, b: t, c: n, discriminant: e };
 }
-function Q(n, t) {
-  let e = n, s = t, i = 1n, l = 0n, o = 0n, r = 1n;
+function st(e, t) {
+  let n = e, s = t, r = 1n, o = 0n, i = 0n, c = 1n;
   for (; s !== 0n; ) {
-    const c = e / s;
-    let b = e;
-    e = s, s = b - c * s, b = i, i = l, l = b - c * l, b = o, o = r, r = b - c * r;
+    const l = n / s;
+    let _ = n;
+    n = s, s = _ - l * s, _ = r, r = o, o = _ - l * o, _ = i, i = c, c = _ - l * c;
   }
-  return e < 0n && (e = -e, i = -i, o = -o), { gcd: e, x: i, y: o };
+  return n < 0n && (n = -n, r = -r, i = -i), { gcd: n, x: r, y: i };
 }
-function it(n, t) {
-  const e = n.a, s = t.a, i = n.b, l = t.b, o = t.c, r = (i + l) / 2n, c = Q(e, s), b = c.gcd, g = c.y, h = Q(b, r), f = h.gcd, a = h.x, m = h.y, y = a * g, w = m, _ = y * (i - l), p = w * o * 2n, A = _ - p, W = 2n * e / f;
+function at(e, t) {
+  const n = e.a, s = t.a, r = e.b, o = t.b, i = t.c, c = (r + o) / 2n, l = st(n, s), _ = l.gcd, w = l.y, d = st(_, c), u = d.gcd, a = d.x, m = d.y, g = a * w, h = m, y = g * (r - o), S = h * i * 2n, A = y - S, W = 2n * n / u;
   let v = A % W;
   v < 0n && (v += W);
-  const E = v, B = f * f, T = e * s / B, I = s / f * E, M = l + I, C = M * M - n.discriminant, J = T * 4n, G = C / J;
-  return st({ a: T, b: M, c: G, discriminant: n.discriminant });
+  const B = v, x = u * u, I = n * s / x, M = s / u * B, R = o + M, N = R * R - e.discriminant, P = I * 4n, K = N / P;
+  return lt({ a: I, b: R, c: K, discriminant: e.discriminant });
 }
-function ot(n) {
-  return it(n, n);
+function ft(e) {
+  return at(e, e);
 }
-function yt(n, t) {
-  let e = wt(n.discriminant), s = n, i = t;
-  for (; i > 0n; )
-    i & 1n && (e = it(e, s)), s = ot(s), i >>= 1n;
-  return e;
+function vt(e, t) {
+  let n = pt(e.discriminant), s = e, r = t;
+  for (; r > 0n; )
+    r & 1n && (n = at(n, s)), s = ft(s), r >>= 1n;
+  return n;
 }
-function U(n, t, e) {
+function U(e, t, n) {
   let s = 1n;
-  for (n = (n % e + e) % e; t > 0n; )
-    t & 1n && (s = s * n % e), t >>= 1n, n = n * n % e;
+  for (e = (e % n + n) % n; t > 0n; )
+    t & 1n && (s = s * e % n), t >>= 1n, e = e * e % n;
   return s;
 }
-function rt(n, t) {
-  if (n < 2n)
+function ut(e, t) {
+  if (e < 2n)
     return !1;
-  if (n === 2n || n === 3n)
+  if (e === 2n || e === 3n)
     return !0;
-  if (n % 2n === 0n)
+  if (e % 2n === 0n)
     return !1;
-  let e = 0n, s = n - 1n;
+  let n = 0n, s = e - 1n;
   for (; s % 2n === 0n; )
-    s /= 2n, e++;
-  const i = [
+    s /= 2n, n++;
+  const r = [
     2n,
     3n,
     5n,
@@ -287,171 +287,171 @@ function rt(n, t) {
     167n,
     173n
   ];
-  for (const l of i) {
-    if (n <= l)
+  for (const o of r) {
+    if (e <= o)
       break;
-    let o = U(l, s, n);
-    if (o === 1n || o === n - 1n)
+    let i = U(o, s, e);
+    if (i === 1n || i === e - 1n)
       continue;
-    let r = !0;
-    for (let c = 0n; c < e - 1n; c++)
-      if (o = U(o, 2n, n), o === n - 1n) {
-        r = !1;
+    let c = !0;
+    for (let l = 0n; l < n - 1n; l++)
+      if (i = U(i, 2n, e), i === e - 1n) {
+        c = !1;
         break;
       }
-    if (r)
+    if (c)
       return !1;
   }
   return !0;
 }
-function gt(n, t) {
-  if (U(n, (t - 1n) / 2n, t) !== 1n)
+function St(e, t) {
+  if (U(e, (t - 1n) / 2n, t) !== 1n)
     return 0n;
   if (t % 4n === 3n)
-    return U(n, (t + 1n) / 4n, t);
-  let e = 0n, s = t - 1n;
+    return U(e, (t + 1n) / 4n, t);
+  let n = 0n, s = t - 1n;
   for (; s % 2n === 0n; )
-    s /= 2n, e++;
-  let i = 2n;
-  for (; U(i, (t - 1n) / 2n, t) === 1n; )
-    i++;
-  let l = U(i, s, t), o = U(n, (s + 1n) / 2n, t), r = U(n, s, t), c = e;
-  for (; r !== 1n; ) {
-    let b = r, g = 0n;
-    for (; b !== 1n; )
-      if (b = b * b % t, g++, g === c)
+    s /= 2n, n++;
+  let r = 2n;
+  for (; U(r, (t - 1n) / 2n, t) === 1n; )
+    r++;
+  let o = U(r, s, t), i = U(e, (s + 1n) / 2n, t), c = U(e, s, t), l = n;
+  for (; c !== 1n; ) {
+    let _ = c, w = 0n;
+    for (; _ !== 1n; )
+      if (_ = _ * _ % t, w++, w === l)
         return 0n;
-    let h = l;
-    for (let f = 0n; f < c - g - 1n; f++)
-      h = h * h % t;
-    c = g, l = h * h % t, r = r * l % t, o = o * h % t;
+    let d = o;
+    for (let u = 0n; u < l - w - 1n; u++)
+      d = d * d % t;
+    l = w, o = d * d % t, c = c * o % t, i = i * d % t;
   }
-  return o;
+  return i;
 }
-function _t(n, t) {
-  const e = P(n);
-  let s = Y(e);
+function Ft(e, t) {
+  const n = Y(e);
+  let s = tt(n);
   for (; ; ) {
     if (s % 2n === 0n) {
       s++;
       continue;
     }
-    if (rt(s)) {
-      const f = U(t, (s - 1n) / 2n, s), a = (1n % s + s) % s;
-      if (f === a || f === 1n)
+    if (ut(s)) {
+      const u = U(t, (s - 1n) / 2n, s), a = (1n % s + s) % s;
+      if (u === a || u === 1n)
         break;
     }
     s++;
   }
-  const i = s, l = (t % i + i) % i;
-  let o = gt(l, i);
-  const r = o % 2n === 0n ? i - o : o, c = r * r, b = i * 4n, h = (c - t) / b;
-  return st({ a: i, b: r, c: h, discriminant: t });
+  const r = s, o = (t % r + r) % r;
+  let i = St(o, r);
+  const c = i % 2n === 0n ? r - i : i, l = c * c, _ = r * 4n, d = (l - t) / _;
+  return lt({ a: r, b: c, c: d, discriminant: t });
 }
-function mt(n, t, e) {
-  const s = O(n), i = O(t), l = q(e), o = new Uint8Array(s.length + i.length + l.length);
-  o.set(s, 0), o.set(i, s.length), o.set(l, s.length + i.length);
-  const r = P(o);
-  let c = 0n;
+function At(e, t, n) {
+  const s = j(e), r = j(t), o = $(n), i = new Uint8Array(s.length + r.length + o.length);
+  i.set(s, 0), i.set(r, s.length), i.set(o, s.length + r.length);
+  const c = Y(i);
+  let l = 0n;
   for (; ; ) {
-    const b = new Uint8Array(8);
-    new DataView(b.buffer).setBigUint64(0, c, !1);
-    const h = new Uint8Array(r.length + 8);
-    h.set(r, 0), h.set(b, r.length);
-    const f = P(h);
-    let a = Y(f.slice(0, 16));
-    if (a |= 1n, rt(a))
+    const _ = new Uint8Array(8);
+    new DataView(_.buffer).setBigUint64(0, l, !1);
+    const d = new Uint8Array(c.length + 8);
+    d.set(c, 0), d.set(_, c.length);
+    const u = Y(d);
+    let a = tt(u.slice(0, 16));
+    if (a |= 1n, ut(a))
       return a;
-    c++;
+    l++;
   }
 }
-function vt(n) {
-  const t = [...n].sort((i, l) => i - l), e = new Uint8Array(t.length * 4), s = new DataView(e.buffer);
-  for (let i = 0; i < t.length; i++)
-    s.setUint32(i * 4, t[i], !0);
-  return e;
+function Ut(e) {
+  const t = [...e].sort((r, o) => r - o), n = new Uint8Array(t.length * 4), s = new DataView(n.buffer);
+  for (let r = 0; r < t.length; r++)
+    s.setUint32(r * 4, t[r], !0);
+  return n;
 }
-function pt(n, t, e) {
-  if (n.length < 16)
+function Et(e, t, n) {
+  if (e.length < 16)
     throw new Error("Seed too short");
-  const s = n.slice(0, 16), i = 1n << BigInt(t + 2), l = (1n << BigInt(t)) - 1n, o = 1 << t, r = new Array(o);
-  for (let a = 0; a < o; a++)
-    r[a] = [];
-  const c = Number(i), b = Math.floor(c / 100);
-  for (let a = 0; a < c; a++) {
-    const [m, y] = dt(s, BigInt(a), l), w = Number(m), _ = Number(y);
-    w !== _ && (r[w].push([_, a]), r[_].push([w, a]), e && a % b === 0 && e(Math.floor(a / c * 50)));
+  const s = e.slice(0, 16), r = 1n << BigInt(t + 2), o = (1n << BigInt(t)) - 1n, i = 1 << t, c = new Array(i);
+  for (let a = 0; a < i; a++)
+    c[a] = [];
+  const l = Number(r), _ = Math.floor(l / 100);
+  for (let a = 0; a < l; a++) {
+    const [m, g] = yt(s, BigInt(a), o), h = Number(m), y = Number(g);
+    h !== y && (c[h].push([y, a]), c[y].push([h, a]), n && a % _ === 0 && n(Math.floor(a / l * 50)));
   }
-  const g = /* @__PURE__ */ new Set(), h = [];
-  function f(a, m, y) {
-    g.add(a);
-    for (const [w, _] of r[a]) {
-      if (w === m && y === 41)
-        return [...h, _];
-      if (!g.has(w) && y < 42) {
-        h.push(_);
-        const p = f(w, m, y + 1);
-        if (p)
-          return p;
-        h.pop();
+  const w = /* @__PURE__ */ new Set(), d = [];
+  function u(a, m, g) {
+    w.add(a);
+    for (const [h, y] of c[a]) {
+      if (h === m && g === 41)
+        return [...d, y];
+      if (!w.has(h) && g < 42) {
+        d.push(y);
+        const S = u(h, m, g + 1);
+        if (S)
+          return S;
+        d.pop();
       }
     }
-    return g.delete(a), null;
+    return w.delete(a), null;
   }
-  for (let a = 0; a < o; a++) {
-    if (r[a].length === 0)
+  for (let a = 0; a < i; a++) {
+    if (c[a].length === 0)
       continue;
-    e && a % 1e3 === 0 && e(50 + Math.floor(a / o * 50)), g.clear(), h.length = 0;
-    const m = f(a, a, 0);
+    n && a % 1e3 === 0 && n(50 + Math.floor(a / i * 50)), w.clear(), d.length = 0;
+    const m = u(a, a, 0);
     if (m)
-      return e && e(100), m;
+      return n && n(100), m;
   }
   return null;
 }
-function St(n, t, e, s, i) {
-  const l = H(n), o = H(t), c = -Y(o), g = pt(l, s, i ? (u) => i(Math.floor(u * 0.6)) : void 0);
-  if (!g)
+function Bt(e, t, n, s, r) {
+  const o = G(e), i = G(t), l = -tt(i), w = Et(o, s, r ? (b) => r(Math.floor(b * 0.6)) : void 0);
+  if (!w)
     throw new Error("No 42-cycle found (try different seed)");
-  i && i(60);
-  const h = vt(g), f = _t(h, c), a = j(O(f)), m = j(q(c));
-  console.log("DEBUG_X_CLIENT:", a), console.log("DEBUG_SEED_CLIENT:", n), console.log("DEBUG_D_CLIENT:", m), i && i(65);
-  let y = f;
-  const w = 65, p = 90 - w;
-  for (let u = 0; u < e; u++)
-    if (y = ot(y), i && u % 100 === 0) {
-      const I = u / e * p;
-      i(Math.floor(w + I));
+  r && r(60);
+  const d = Ut(w), u = Ft(d, l), a = V(j(u)), m = V($(l));
+  console.log("DEBUG_X_CLIENT:", a), console.log("DEBUG_SEED_CLIENT:", e), console.log("DEBUG_D_CLIENT:", m), r && r(65);
+  let g = u;
+  const h = 65, S = 90 - h;
+  for (let b = 0; b < n; b++)
+    if (g = ft(g), r && b % 100 === 0) {
+      const M = b / n * S;
+      r(Math.floor(h + M));
     }
-  i && i(90);
-  const A = mt(f, y, c), v = Ft(e) / A, E = yt(f, v);
-  i && i(100);
-  const B = O(y), T = O(E);
+  r && r(90);
+  const A = At(u, g, l), v = xt(n) / A, B = vt(u, v);
+  r && r(100);
+  const x = j(g), I = j(B);
   return {
-    cycle: g,
-    y: j(B),
-    pi: j(T),
+    cycle: w,
+    y: V(x),
+    pi: V(I),
     memory_bytes: (1 << s) * 1200
     // Fallback estimate: ~1.2KB per node overhead for JS objects
   };
 }
-function Ft(n) {
-  return 1n << BigInt(n);
+function xt(e) {
+  return 1n << BigInt(e);
 }
-function H(n) {
-  const t = new Uint8Array(n.length / 2);
-  for (let e = 0; e < t.length; e++)
-    t[e] = parseInt(n.substr(e * 2, 2), 16);
+function G(e) {
+  const t = new Uint8Array(e.length / 2);
+  for (let n = 0; n < t.length; n++)
+    t[n] = parseInt(e.substr(n * 2, 2), 16);
   return t;
 }
-function j(n) {
-  return Array.from(n).map((t) => t.toString(16).padStart(2, "0")).join("");
+function V(e) {
+  return Array.from(e).map((t) => t.toString(16).padStart(2, "0")).join("");
 }
-function At() {
+function It() {
   try {
     if (typeof WebAssembly > "u")
       return !1;
     if (typeof WebAssembly == "object" && typeof WebAssembly.instantiate == "function") {
-      const n = new Uint8Array([
+      const e = new Uint8Array([
         0,
         97,
         115,
@@ -463,235 +463,348 @@ function At() {
         0
         // Version
       ]);
-      return WebAssembly.validate(n);
+      return WebAssembly.validate(e);
     }
   } catch {
     return !1;
   }
   return !1;
 }
-let ct = null, N = !1, tt = !0, x = !1;
+let dt = null, H = !1, rt = !0, O = !1;
 try {
-  x = At();
-} catch (n) {
-  console.warn("Failed to check WASM support, defaulting to false:", n), x = !1;
+  O = It();
+} catch (e) {
+  console.warn("Failed to check WASM support, defaulting to false:", e), O = !1;
 }
-async function Ut(n) {
-  if (!x)
+async function Wt(e) {
+  if (!O)
     return console.warn("WebAssembly not supported in this environment. Using JS fallback."), !1;
   try {
     const t = (await Promise.resolve().then(function() {
-      return et;
+      return ct;
     })).default;
-    return await t(n || "zeno.wasm"), ct = await Promise.resolve().then(function() {
-      return et;
-    }), N = !0, console.log("WASM solver initialized successfully"), !0;
+    return await t(e || "zeno.wasm"), dt = await Promise.resolve().then(function() {
+      return ct;
+    }), H = !0, console.log("WASM solver initialized successfully"), !0;
   } catch (t) {
     return console.warn("WASM initialization failed, falling back to JS solver:", t), !1;
   }
 }
-self.onmessage = async (n) => {
-  const { type: t, challenge: e, wasm_url: s, force_js: i } = n.data;
+self.onmessage = async (e) => {
+  const { type: t, challenge: n, wasm_url: s, force_js: r } = e.data;
   if (t === "SOLVE")
     try {
-      const l = i || !x;
-      !l && !N && (tt = await Ut(s));
-      const o = tt && N && !l;
+      const o = r || !O;
+      !o && !H && (rt = await Wt(s));
+      const i = rt && H && !o;
       self.postMessage({
         type: "STATUS",
-        mode: o ? "wasm" : "js",
-        wasmSupported: x
-      }), console.log(`Starting Zeno Solver (${o ? "WASM" : "JS fallback"})...`);
-      let r, c = 0;
-      if (o)
-        r = ct.solve_wasm(
-          e.seed,
-          e.discriminant,
-          BigInt(e.vdf),
-          e.graph_bits
-        ), c = r.memory_bytes || 0;
-      else {
-        const b = (g) => {
+        mode: i ? "wasm" : "js",
+        wasmSupported: O
+      }), console.log(`Starting Zeno Solver (${i ? "WASM" : "JS fallback"})...`);
+      let c, l = 0;
+      if (i) {
+        const _ = new dt.WasmVdfSolver(
+          n.seed,
+          n.discriminant,
+          BigInt(n.vdf),
+          n.graph_bits
+        );
+        let w = !1;
+        for (; !w; ) {
+          const d = _.step(1e4);
+          if (d.status === "progress") {
+            if (self.performance?.memory?.usedJSHeapSize) {
+              const u = self.performance.memory.usedJSHeapSize;
+              u > l && (l = u);
+            }
+            self.postMessage({ type: "PROGRESS", percent: d.percent }), await new Promise((u) => setTimeout(u, 0));
+          } else
+            d.status === "done" && (c = d.output, l = c.memory_bytes || l, w = !0);
+        }
+        _.free && _.free();
+      } else {
+        const _ = (w) => {
           if (self.performance?.memory?.usedJSHeapSize) {
-            const h = self.performance.memory.usedJSHeapSize;
-            h > c && (c = h);
+            const d = self.performance.memory.usedJSHeapSize;
+            d > l && (l = d);
           }
-          self.postMessage({ type: "PROGRESS", percent: g });
+          self.postMessage({ type: "PROGRESS", percent: w });
         };
-        r = St(
-          e.seed,
-          e.discriminant,
-          e.vdf,
-          e.graph_bits,
-          b
-        ), c === 0 && r.memory_bytes && (c = r.memory_bytes);
+        c = Bt(
+          n.seed,
+          n.discriminant,
+          n.vdf,
+          n.graph_bits,
+          _
+        ), l === 0 && c.memory_bytes && (l = c.memory_bytes);
       }
       self.postMessage({
         type: "SOLVED",
-        payload: r,
-        memory: c,
-        mode: o ? "wasm" : "js"
+        payload: c,
+        memory: l,
+        mode: i ? "wasm" : "js"
       });
-    } catch (l) {
-      console.error("Solver Error:", l), self.postMessage({ type: "ERROR", error: l.toString() });
+    } catch (o) {
+      console.error("Solver Error:", o), self.postMessage({ type: "ERROR", error: o.toString() });
     }
   t === "CHECK_WASM" && self.postMessage({
     type: "WASM_STATUS",
-    supported: x,
-    initialized: N
+    supported: O,
+    initialized: H
   });
 };
-let d;
-function Et(n, t) {
-  return n = n >>> 0, R().subarray(n / 1, n / 1 + t);
+let f;
+function Mt(e) {
+  const t = f.__externref_table_alloc();
+  return f.__wbindgen_externrefs.set(t, e), t;
 }
-function nt(n, t) {
-  return n = n >>> 0, It(n, t);
+function Z(e) {
+  const t = typeof e;
+  if (t == "number" || t == "boolean" || e == null)
+    return `${e}`;
+  if (t == "string")
+    return `"${e}"`;
+  if (t == "symbol") {
+    const r = e.description;
+    return r == null ? "Symbol" : `Symbol(${r})`;
+  }
+  if (t == "function") {
+    const r = e.name;
+    return typeof r == "string" && r.length > 0 ? `Function(${r})` : "Function";
+  }
+  if (Array.isArray(e)) {
+    const r = e.length;
+    let o = "[";
+    r > 0 && (o += Z(e[0]));
+    for (let i = 1; i < r; i++)
+      o += ", " + Z(e[i]);
+    return o += "]", o;
+  }
+  const n = /\[object ([^\]]+)\]/.exec(toString.call(e));
+  let s;
+  if (n && n.length > 1)
+    s = n[1];
+  else
+    return toString.call(e);
+  if (s == "Object")
+    try {
+      return "Object(" + JSON.stringify(e) + ")";
+    } catch {
+      return "Object";
+    }
+  return e instanceof Error ? `${e.name}: ${e.message}
+${e.stack}` : s;
 }
-let k = null;
-function Bt() {
-  return (k === null || k.byteLength === 0) && (k = new Uint32Array(d.memory.buffer)), k;
+function Rt(e, t) {
+  return e = e >>> 0, z().subarray(e / 1, e / 1 + t);
+}
+let T = null;
+function q() {
+  return (T === null || T.buffer.detached === !0 || T.buffer.detached === void 0 && T.buffer !== f.memory.buffer) && (T = new DataView(f.memory.buffer)), T;
+}
+function it(e, t) {
+  return e = e >>> 0, Dt(e, t);
+}
+let D = null;
+function Tt() {
+  return (D === null || D.byteLength === 0) && (D = new Uint32Array(f.memory.buffer)), D;
 }
 let L = null;
-function R() {
-  return (L === null || L.byteLength === 0) && (L = new Uint8Array(d.memory.buffer)), L;
+function z() {
+  return (L === null || L.byteLength === 0) && (L = new Uint8Array(f.memory.buffer)), L;
 }
-function lt(n, t) {
-  const e = t(n.length * 4, 4) >>> 0;
-  return Bt().set(n, e / 4), S = n.length, e;
-}
-function Tt(n, t) {
-  const e = t(n.length * 1, 1) >>> 0;
-  return R().set(n, e / 1), S = n.length, e;
-}
-function z(n, t, e) {
-  if (e === void 0) {
-    const r = D.encode(n), c = t(r.length, 1) >>> 0;
-    return R().subarray(c, c + r.length).set(r), S = r.length, c;
+function Ot(e, t) {
+  try {
+    return e.apply(this, t);
+  } catch (n) {
+    const s = Mt(n);
+    f.__wbindgen_exn_store(s);
   }
-  let s = n.length, i = t(s, 1) >>> 0;
-  const l = R();
-  let o = 0;
-  for (; o < s; o++) {
-    const r = n.charCodeAt(o);
-    if (r > 127)
+}
+function _t(e, t) {
+  const n = t(e.length * 4, 4) >>> 0;
+  return Tt().set(e, n / 4), p = e.length, n;
+}
+function zt(e, t) {
+  const n = t(e.length * 1, 1) >>> 0;
+  return z().set(e, n / 1), p = e.length, n;
+}
+function E(e, t, n) {
+  if (n === void 0) {
+    const c = C.encode(e), l = t(c.length, 1) >>> 0;
+    return z().subarray(l, l + c.length).set(c), p = c.length, l;
+  }
+  let s = e.length, r = t(s, 1) >>> 0;
+  const o = z();
+  let i = 0;
+  for (; i < s; i++) {
+    const c = e.charCodeAt(i);
+    if (c > 127)
       break;
-    l[i + o] = r;
+    o[r + i] = c;
   }
-  if (o !== s) {
-    o !== 0 && (n = n.slice(o)), i = e(i, s, s = o + n.length * 3, 1) >>> 0;
-    const r = R().subarray(i + o, i + s), c = D.encodeInto(n, r);
-    o += c.written, i = e(i, s, o, 1) >>> 0;
+  if (i !== s) {
+    i !== 0 && (e = e.slice(i)), r = n(r, s, s = i + e.length * 3, 1) >>> 0;
+    const c = z().subarray(r + i, r + s), l = C.encodeInto(e, c);
+    i += l.written, r = n(r, s, i, 1) >>> 0;
   }
-  return S = o, i;
+  return p = i, r;
 }
-function X(n) {
-  const t = d.__wbindgen_externrefs.get(n);
-  return d.__externref_table_dealloc(n), t;
+function k(e) {
+  const t = f.__wbindgen_externrefs.get(e);
+  return f.__externref_table_dealloc(e), t;
 }
-let V = new TextDecoder("utf-8", { ignoreBOM: !0, fatal: !0 });
-V.decode();
-const Wt = 2146435072;
-let K = 0;
-function It(n, t) {
-  return K += t, K >= Wt && (V = new TextDecoder("utf-8", { ignoreBOM: !0, fatal: !0 }), V.decode(), K = t), V.decode(R().subarray(n, n + t));
+let J = new TextDecoder("utf-8", { ignoreBOM: !0, fatal: !0 });
+J.decode();
+const kt = 2146435072;
+let X = 0;
+function Dt(e, t) {
+  return X += t, X >= kt && (J = new TextDecoder("utf-8", { ignoreBOM: !0, fatal: !0 }), J.decode(), X = t), J.decode(z().subarray(e, e + t));
 }
-const D = new TextEncoder();
-"encodeInto" in D || (D.encodeInto = function(n, t) {
-  const e = D.encode(n);
-  return t.set(e), {
-    read: n.length,
-    written: e.length
+const C = new TextEncoder();
+"encodeInto" in C || (C.encodeInto = function(e, t) {
+  const n = C.encode(e);
+  return t.set(n), {
+    read: e.length,
+    written: n.length
   };
 });
-let S = 0;
-function Mt() {
-  return d.get_memory_bytes() >>> 0;
+let p = 0;
+const ot = typeof FinalizationRegistry > "u" ? { register: () => {
+}, unregister: () => {
+} } : new FinalizationRegistry((e) => f.__wbg_wasmvdfsolver_free(e >>> 0, 1));
+class Q {
+  __destroy_into_raw() {
+    const t = this.__wbg_ptr;
+    return this.__wbg_ptr = 0, ot.unregister(this), t;
+  }
+  free() {
+    const t = this.__destroy_into_raw();
+    f.__wbg_wasmvdfsolver_free(t, 0);
+  }
+  /**
+   * @param {string} seed_hex
+   * @param {string} discriminant_hex
+   * @param {bigint} vdf_iters
+   * @param {number} graph_bits
+   */
+  constructor(t, n, s, r) {
+    const o = E(t, f.__wbindgen_malloc, f.__wbindgen_realloc), i = p, c = E(n, f.__wbindgen_malloc, f.__wbindgen_realloc), l = p, _ = f.wasmvdfsolver_new(o, i, c, l, s, r);
+    if (_[2])
+      throw k(_[1]);
+    return this.__wbg_ptr = _[0] >>> 0, ot.register(this, this.__wbg_ptr, this), this;
+  }
+  /**
+   * @param {number} iterations
+   * @returns {any}
+   */
+  step(t) {
+    const n = f.wasmvdfsolver_step(this.__wbg_ptr, t);
+    if (n[2])
+      throw k(n[1]);
+    return k(n[0]);
+  }
 }
-function xt(n) {
-  const t = lt(n, d.__wbindgen_malloc), e = S, s = d.serialize_cycle(t, e);
-  var i = Et(s[0], s[1]).slice();
-  return d.__wbindgen_free(s[0], s[1] * 1, 1), i;
+Symbol.dispose && (Q.prototype[Symbol.dispose] = Q.prototype.free);
+function Lt() {
+  return f.get_memory_bytes() >>> 0;
 }
-function Rt(n, t, e, s) {
-  const i = z(n, d.__wbindgen_malloc, d.__wbindgen_realloc), l = S, o = z(t, d.__wbindgen_malloc, d.__wbindgen_realloc), r = S, c = d.solve_wasm(i, l, o, r, e, s);
-  if (c[2])
-    throw X(c[1]);
-  return X(c[0]);
+function jt(e) {
+  const t = _t(e, f.__wbindgen_malloc), n = p, s = f.serialize_cycle(t, n);
+  var r = Rt(s[0], s[1]).slice();
+  return f.__wbindgen_free(s[0], s[1] * 1, 1), r;
 }
-function kt(n, t, e, s, i, l, o) {
-  const r = z(n, d.__wbindgen_malloc, d.__wbindgen_realloc), c = S, b = lt(t, d.__wbindgen_malloc), g = S, h = z(e, d.__wbindgen_malloc, d.__wbindgen_realloc), f = S, a = z(s, d.__wbindgen_malloc, d.__wbindgen_realloc), m = S, y = Tt(i, d.__wbindgen_malloc), w = S, _ = d.verify_proof(r, c, b, g, h, f, a, m, y, w, l, o);
-  if (_[2])
-    throw X(_[1]);
-  return _[0] !== 0;
+function Ct(e, t, n, s) {
+  const r = E(e, f.__wbindgen_malloc, f.__wbindgen_realloc), o = p, i = E(t, f.__wbindgen_malloc, f.__wbindgen_realloc), c = p, l = f.solve_wasm(r, o, i, c, n, s);
+  if (l[2])
+    throw k(l[1]);
+  return k(l[0]);
 }
-const Lt = /* @__PURE__ */ new Set(["basic", "cors", "default"]);
-async function Ot(n, t) {
-  if (typeof Response == "function" && n instanceof Response) {
+function Nt(e, t, n, s, r, o, i) {
+  const c = E(e, f.__wbindgen_malloc, f.__wbindgen_realloc), l = p, _ = _t(t, f.__wbindgen_malloc), w = p, d = E(n, f.__wbindgen_malloc, f.__wbindgen_realloc), u = p, a = E(s, f.__wbindgen_malloc, f.__wbindgen_realloc), m = p, g = zt(r, f.__wbindgen_malloc), h = p, y = f.verify_proof(c, l, _, w, d, u, a, m, g, h, o, i);
+  if (y[2])
+    throw k(y[1]);
+  return y[0] !== 0;
+}
+const Vt = /* @__PURE__ */ new Set(["basic", "cors", "default"]);
+async function qt(e, t) {
+  if (typeof Response == "function" && e instanceof Response) {
     if (typeof WebAssembly.instantiateStreaming == "function")
       try {
-        return await WebAssembly.instantiateStreaming(n, t);
+        return await WebAssembly.instantiateStreaming(e, t);
       } catch (s) {
-        if (n.ok && Lt.has(n.type) && n.headers.get("Content-Type") !== "application/wasm")
+        if (e.ok && Vt.has(e.type) && e.headers.get("Content-Type") !== "application/wasm")
           console.warn("`WebAssembly.instantiateStreaming` failed because your server does not serve Wasm with `application/wasm` MIME type. Falling back to `WebAssembly.instantiate` which is slower. Original error:\n", s);
         else
           throw s;
       }
-    const e = await n.arrayBuffer();
-    return await WebAssembly.instantiate(e, t);
+    const n = await e.arrayBuffer();
+    return await WebAssembly.instantiate(n, t);
   } else {
-    const e = await WebAssembly.instantiate(n, t);
-    return e instanceof WebAssembly.Instance ? { instance: e, module: n } : e;
+    const n = await WebAssembly.instantiate(e, t);
+    return n instanceof WebAssembly.Instance ? { instance: n, module: e } : n;
   }
 }
-function at() {
-  const n = {};
-  return n.wbg = {}, n.wbg.__wbg___wbindgen_throw_dd24417ed36fc46e = function(t, e) {
-    throw new Error(nt(t, e));
-  }, n.wbg.__wbg_new_1ba21ce319a06297 = function() {
+function bt() {
+  const e = {};
+  return e.wbg = {}, e.wbg.__wbg_String_fed4d24b68977888 = function(t, n) {
+    const s = String(n), r = E(s, f.__wbindgen_malloc, f.__wbindgen_realloc), o = p;
+    q().setInt32(t + 4 * 1, o, !0), q().setInt32(t + 4 * 0, r, !0);
+  }, e.wbg.__wbg___wbindgen_debug_string_adfb662ae34724b6 = function(t, n) {
+    const s = Z(n), r = E(s, f.__wbindgen_malloc, f.__wbindgen_realloc), o = p;
+    q().setInt32(t + 4 * 1, o, !0), q().setInt32(t + 4 * 0, r, !0);
+  }, e.wbg.__wbg___wbindgen_throw_dd24417ed36fc46e = function(t, n) {
+    throw new Error(it(t, n));
+  }, e.wbg.__wbg_new_1ba21ce319a06297 = function() {
     return new Object();
-  }, n.wbg.__wbg_new_25f239778d6112b9 = function() {
+  }, e.wbg.__wbg_new_25f239778d6112b9 = function() {
     return new Array();
-  }, n.wbg.__wbg_set_3fda3bac07393de4 = function(t, e, s) {
-    t[e] = s;
-  }, n.wbg.__wbg_set_7df433eea03a5c14 = function(t, e, s) {
-    t[e >>> 0] = s;
-  }, n.wbg.__wbindgen_cast_2241b6af4c4b2941 = function(t, e) {
-    return nt(t, e);
-  }, n.wbg.__wbindgen_cast_d6cd19b81560fd6e = function(t) {
+  }, e.wbg.__wbg_set_3fda3bac07393de4 = function(t, n, s) {
+    t[n] = s;
+  }, e.wbg.__wbg_set_781438a03c0c3c81 = function() {
+    return Ot(function(t, n, s) {
+      return Reflect.set(t, n, s);
+    }, arguments);
+  }, e.wbg.__wbg_set_7df433eea03a5c14 = function(t, n, s) {
+    t[n >>> 0] = s;
+  }, e.wbg.__wbindgen_cast_2241b6af4c4b2941 = function(t, n) {
+    return it(t, n);
+  }, e.wbg.__wbindgen_cast_d6cd19b81560fd6e = function(t) {
     return t;
-  }, n.wbg.__wbindgen_init_externref_table = function() {
-    const t = d.__wbindgen_externrefs, e = t.grow(4);
-    t.set(0, void 0), t.set(e + 0, void 0), t.set(e + 1, null), t.set(e + 2, !0), t.set(e + 3, !1);
-  }, n;
+  }, e.wbg.__wbindgen_init_externref_table = function() {
+    const t = f.__wbindgen_externrefs, n = t.grow(4);
+    t.set(0, void 0), t.set(n + 0, void 0), t.set(n + 1, null), t.set(n + 2, !0), t.set(n + 3, !1);
+  }, e;
 }
-function ft(n, t) {
-  return d = n.exports, ut.__wbindgen_wasm_module = t, k = null, L = null, d.__wbindgen_start(), d;
+function ht(e, t) {
+  return f = e.exports, wt.__wbindgen_wasm_module = t, T = null, D = null, L = null, f.__wbindgen_start(), f;
 }
-function zt(n) {
-  if (d !== void 0)
-    return d;
-  typeof n < "u" && (Object.getPrototypeOf(n) === Object.prototype ? { module: n } = n : console.warn("using deprecated parameters for `initSync()`; pass a single object instead"));
-  const t = at();
-  n instanceof WebAssembly.Module || (n = new WebAssembly.Module(n));
-  const e = new WebAssembly.Instance(n, t);
-  return ft(e, n);
+function Ht(e) {
+  if (f !== void 0)
+    return f;
+  typeof e < "u" && (Object.getPrototypeOf(e) === Object.prototype ? { module: e } = e : console.warn("using deprecated parameters for `initSync()`; pass a single object instead"));
+  const t = bt();
+  e instanceof WebAssembly.Module || (e = new WebAssembly.Module(e));
+  const n = new WebAssembly.Instance(e, t);
+  return ht(n, e);
 }
-async function ut(n) {
-  if (d !== void 0)
-    return d;
-  typeof n < "u" && (Object.getPrototypeOf(n) === Object.prototype ? { module_or_path: n } = n : console.warn("using deprecated parameters for the initialization function; pass a single object instead")), typeof n > "u" && (n = new URL("zeno.wasm", self.location));
-  const t = at();
-  (typeof n == "string" || typeof Request == "function" && n instanceof Request || typeof URL == "function" && n instanceof URL) && (n = fetch(n));
-  const { instance: e, module: s } = await Ot(await n, t);
-  return ft(e, s);
+async function wt(e) {
+  if (f !== void 0)
+    return f;
+  typeof e < "u" && (Object.getPrototypeOf(e) === Object.prototype ? { module_or_path: e } = e : console.warn("using deprecated parameters for the initialization function; pass a single object instead")), typeof e > "u" && (e = new URL("zeno.wasm", self.location));
+  const t = bt();
+  (typeof e == "string" || typeof Request == "function" && e instanceof Request || typeof URL == "function" && e instanceof URL) && (e = fetch(e));
+  const { instance: n, module: s } = await qt(await e, t);
+  return ht(n, s);
 }
-var et = /* @__PURE__ */ Object.freeze({
+var ct = /* @__PURE__ */ Object.freeze({
   __proto__: null,
-  default: ut,
-  get_memory_bytes: Mt,
-  initSync: zt,
-  serialize_cycle: xt,
-  solve_wasm: Rt,
-  verify_proof: kt
+  WasmVdfSolver: Q,
+  default: wt,
+  get_memory_bytes: Lt,
+  initSync: Ht,
+  serialize_cycle: jt,
+  solve_wasm: Ct,
+  verify_proof: Nt
 });

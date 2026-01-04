@@ -69,14 +69,39 @@ self.onmessage = async (event) => {
             let memoryUsage = 0;
 
             if (actuallyUsingWasm) {
-                // WASM Path
-                result = wasmModule.solve_wasm(
+                // WASM Path with Progress
+                // Using new iterative WasmVdfSolver
+                const solver = new wasmModule.WasmVdfSolver(
                     challenge.seed,
                     challenge.discriminant,
                     BigInt(challenge.vdf),
                     challenge.graph_bits
                 );
-                memoryUsage = result.memory_bytes || 0;
+
+                let done = false;
+                while (!done) {
+                    const stepRes = solver.step(10000); // 10k steps per tick
+
+                    if (stepRes.status === 'progress') {
+                        // Report progress
+                        // Update memory usage peak
+                        if ((self.performance as any)?.memory?.usedJSHeapSize) {
+                            const currentMem = (self.performance as any).memory.usedJSHeapSize;
+                            if (currentMem > memoryUsage) memoryUsage = currentMem;
+                        }
+                        self.postMessage({ type: 'PROGRESS', percent: stepRes.percent });
+
+                        // Yield to event loop to allow message dispatch
+                        await new Promise(r => setTimeout(r, 0));
+                    } else if (stepRes.status === 'done') {
+                        result = stepRes.output;
+                        memoryUsage = result.memory_bytes || memoryUsage;
+                        done = true;
+                    }
+                }
+
+                // Explicitly free solver if necessary (wasm-bindgen classes usually have .free())
+                if (solver.free) solver.free();
             } else {
                 // JS Fallback Path with progress reporting
                 const progressCallback = (percent: number) => {

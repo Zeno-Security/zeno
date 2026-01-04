@@ -38,29 +38,83 @@ pub fn get_memory_bytes() -> u32 {
 }
 
 #[wasm_bindgen]
+pub struct WasmVdfSolver {
+    internal: crate::solver::ZenoSolver,
+}
+
+#[wasm_bindgen]
+impl WasmVdfSolver {
+    #[wasm_bindgen(constructor)]
+    pub fn new(seed_hex: &str, discriminant_hex: &str, vdf_iters: u64, graph_bits: u32) -> Result<WasmVdfSolver, String> {
+        let solver = crate::solver::ZenoSolver::new(seed_hex, discriminant_hex, vdf_iters, graph_bits)?;
+        Ok(WasmVdfSolver { internal: solver })
+    }
+
+    pub fn step(&mut self, iterations: usize) -> Result<JsValue, String> {
+        match self.internal.step(iterations) {
+            crate::solver::StepResult::Progress(p) => {
+                let obj = js_sys::Object::new();
+                js_sys::Reflect::set(&obj, &"status".into(), &"progress".into()).unwrap();
+                js_sys::Reflect::set(&obj, &"percent".into(), &p.into()).unwrap();
+                Ok(obj.into())
+            },
+            crate::solver::StepResult::Done(cycle, y, pi) => {
+                 let y_bytes = y.serialize_strict();
+                 let pi_bytes = pi.serialize_strict();
+                 let memory_bytes = get_memory_bytes();
+
+                 let sol = SolveResult {
+                    cycle,
+                    y: hex::encode(y_bytes),
+                    pi: hex::encode(pi_bytes),
+                    memory_bytes,
+                    test_field: 99999,
+                 };
+                 
+                 let obj = serde_wasm_bindgen::to_value(&sol).map_err(|e| e.to_string())?;
+                 
+                 // Wrap in status: done
+                 let wrapper = js_sys::Object::new();
+                 js_sys::Reflect::set(&wrapper, &"status".into(), &"done".into()).unwrap();
+                 js_sys::Reflect::set(&wrapper, &"output".into(), &obj).unwrap();
+                 Ok(wrapper.into())
+            },
+            crate::solver::StepResult::Error(e) => Err(e),
+        }
+    }
+}
+
+#[wasm_bindgen]
 pub fn solve_wasm(
     seed_hex: &str,
     discriminant_hex: &str,
     vdf: u64,
     graph_bits: u32,
 ) -> Result<JsValue, JsValue> {
-    let (cycle, y, pi) = solve_challenge(seed_hex, discriminant_hex, vdf, graph_bits)
+    // Blocking implementation re-using the solver for consistent logic
+    let mut solver = crate::solver::ZenoSolver::new(seed_hex, discriminant_hex, vdf, graph_bits)
         .map_err(|e| JsValue::from_str(&e))?;
-    
-    let y_bytes = y.serialize_strict();
-    let pi_bytes = pi.serialize_strict();
-
-    let memory_bytes = get_memory_bytes();
-
-    let sol = SolveResult {
-        cycle,
-        y: hex::encode(y_bytes),
-        pi: hex::encode(pi_bytes),
-        memory_bytes,
-        test_field: 99999,
-    };
-    
-    Ok(serde_wasm_bindgen::to_value(&sol)?)
+        
+    loop {
+        match solver.step(100000) {
+             crate::solver::StepResult::Progress(_) => continue,
+             crate::solver::StepResult::Done(cycle, y, pi) => {
+                 let y_bytes = y.serialize_strict();
+                 let pi_bytes = pi.serialize_strict();
+                 let memory_bytes = get_memory_bytes();
+            
+                 let sol = SolveResult {
+                    cycle,
+                    y: hex::encode(y_bytes),
+                    pi: hex::encode(pi_bytes),
+                    memory_bytes,
+                    test_field: 99999,
+                 };
+                 return Ok(serde_wasm_bindgen::to_value(&sol)?);
+             },
+             crate::solver::StepResult::Error(e) => return Err(JsValue::from_str(&e)),
+        }
+    }
 }
 
 #[wasm_bindgen]
