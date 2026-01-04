@@ -407,11 +407,34 @@ function formIdentity(discriminant: bigint): Form {
 }
 
 function extendedGcd(a: bigint, b: bigint): { gcd: bigint; x: bigint; y: bigint } {
-    if (b === 0n) {
-        return { gcd: a, x: 1n, y: 0n };
+    let old_r = a, r = b;
+    let old_s = 1n, s = 0n;
+    let old_t = 0n, t = 1n;
+
+    while (r !== 0n) {
+        const quotient = old_r / r;
+
+        let temp = old_r;
+        old_r = r;
+        r = temp - quotient * r;
+
+        temp = old_s;
+        old_s = s;
+        s = temp - quotient * s;
+
+        temp = old_t;
+        old_t = t;
+        t = temp - quotient * t;
     }
-    const { gcd, x: x1, y: y1 } = extendedGcd(b, a % b);
-    return { gcd, x: y1, y: x1 - (a / b) * y1 };
+
+    // Normalize to positive GCD
+    if (old_r < 0n) {
+        old_r = -old_r;
+        old_s = -old_s;
+        old_t = -old_t;
+    }
+
+    return { gcd: old_r, x: old_s, y: old_t };
 }
 
 function formCompose(f1: Form, f2: Form): Form {

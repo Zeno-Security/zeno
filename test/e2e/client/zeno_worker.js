@@ -1,4 +1,14 @@
-class Z {
+/*
+ * Required Notice: © Copyright 2025 KSEC - Erez Kalman (kaerez[at]gmail[dot]com | www.kalman.co.il | https://github.com/zeno-security/zeno | https://github.com/kaerez)
+ *
+ * This software is licensed under the PolyForm Strict License 1.0.0.
+ * You may obtain a copy of the License at:
+ * * https://polyformproject.org/licenses/strict/1.0.0/
+ *
+ * SPDX-License-Identifier: PolyForm-Strict-1.0.0
+ */
+
+class Y {
   v0;
   v1;
   v2;
@@ -36,14 +46,14 @@ class Z {
   }
 }
 function dt(n, t, e) {
-  const s = new Z(n);
+  const s = new Y(n);
   s.writeU64(2n * t);
-  const i = s.finish() & e, l = new Z(n);
+  const i = s.finish() & e, l = new Y(n);
   l.writeU64(2n * t + 1n);
   const o = l.finish() & e;
   return [i, o];
 }
-const wt = new Uint32Array([
+const bt = new Uint32Array([
   1116352408,
   1899447441,
   3049323471,
@@ -111,24 +121,24 @@ const wt = new Uint32Array([
 ]);
 function K(n) {
   let t = 1779033703, e = 3144134277, s = 1013904242, i = 2773480762, l = 1359893119, o = 2600822924, r = 528734635, a = 1541459225;
-  const g = BigInt(n.length * 8), u = (64 - (n.length + 1 + 8) % 64) % 64, f = new Uint8Array(n.length + 1 + u + 8);
+  const d = BigInt(n.length * 8), u = (64 - (n.length + 1 + 8) % 64) % 64, f = new Uint8Array(n.length + 1 + u + 8);
   f.set(n), f[n.length] = 128;
-  for (let d = 0; d < 8; d++)
-    f[f.length - 1 - d] = Number(g >> BigInt(d * 8) & 0xFFn);
+  for (let b = 0; b < 8; b++)
+    f[f.length - 1 - b] = Number(d >> BigInt(b * 8) & 0xFFn);
   const c = new Uint32Array(64);
-  for (let d = 0; d < f.length; d += 64) {
+  for (let b = 0; b < f.length; b += 64) {
     for (let w = 0; w < 16; w++)
-      c[w] = f[d + w * 4] << 24 | f[d + w * 4 + 1] << 16 | f[d + w * 4 + 2] << 8 | f[d + w * 4 + 3];
+      c[w] = f[b + w * 4] << 24 | f[b + w * 4 + 1] << 16 | f[b + w * 4 + 2] << 8 | f[b + w * 4 + 3];
     for (let w = 16; w < 64; w++) {
-      const I = (A(c[w - 15], 7) ^ A(c[w - 15], 18) ^ c[w - 15] >>> 3) >>> 0, M = (A(c[w - 2], 17) ^ A(c[w - 2], 19) ^ c[w - 2] >>> 10) >>> 0;
-      c[w] = c[w - 16] + I + c[w - 7] + M >>> 0;
+      const x = (A(c[w - 15], 7) ^ A(c[w - 15], 18) ^ c[w - 15] >>> 3) >>> 0, R = (A(c[w - 2], 17) ^ A(c[w - 2], 19) ^ c[w - 2] >>> 10) >>> 0;
+      c[w] = c[w - 16] + x + c[w - 7] + R >>> 0;
     }
-    let b = t, F = e, U = s, E = i, v = l, W = o, p = r, x = a;
+    let y = t, F = e, U = s, E = i, v = l, W = o, p = r, M = a;
     for (let w = 0; w < 64; w++) {
-      const I = (A(v, 6) ^ A(v, 11) ^ A(v, 25)) >>> 0, M = (v & W ^ ~v & p) >>> 0, j = x + I + M + wt[w] + c[w] >>> 0, q = (A(b, 2) ^ A(b, 13) ^ A(b, 22)) >>> 0, H = (b & F ^ b & U ^ F & U) >>> 0, ht = q + H >>> 0;
-      x = p, p = W, W = v, v = E + j >>> 0, E = U, U = F, F = b, b = j + ht >>> 0;
+      const x = (A(v, 6) ^ A(v, 11) ^ A(v, 25)) >>> 0, R = (v & W ^ ~v & p) >>> 0, j = M + x + R + bt[w] + c[w] >>> 0, q = (A(y, 2) ^ A(y, 13) ^ A(y, 22)) >>> 0, H = (y & F ^ y & U ^ F & U) >>> 0, ht = q + H >>> 0;
+      M = p, p = W, W = v, v = E + j >>> 0, E = U, U = F, F = y, y = j + ht >>> 0;
     }
-    t = t + b >>> 0, e = e + F >>> 0, s = s + U >>> 0, i = i + E >>> 0, l = l + v >>> 0, o = o + W >>> 0, r = r + p >>> 0, a = a + x >>> 0;
+    t = t + y >>> 0, e = e + F >>> 0, s = s + U >>> 0, i = i + E >>> 0, l = l + v >>> 0, o = o + W >>> 0, r = r + p >>> 0, a = a + M >>> 0;
   }
   const m = new Uint8Array(32), _ = new DataView(m.buffer);
   return _.setUint32(0, t, !1), _.setUint32(4, e, !1), _.setUint32(8, s, !1), _.setUint32(12, i, !1), _.setUint32(16, l, !1), _.setUint32(20, o, !1), _.setUint32(24, r, !1), _.setUint32(28, a, !1), m;
@@ -156,7 +166,7 @@ function P(n) {
     return V(i);
   }
 }
-function Y(n) {
+function X(n) {
   let t = 0n;
   for (const e of n)
     t = t << 8n | BigInt(e);
@@ -166,7 +176,7 @@ function N(n) {
   const t = P(n.a), e = P(n.b), s = new Uint8Array(2 + t.length + 2 + e.length), i = new DataView(s.buffer);
   return i.setUint16(0, t.length, !1), s.set(t, 2), i.setUint16(2 + t.length, e.length, !1), s.set(e, 4 + t.length), s;
 }
-function $(n) {
+function Z(n) {
   const t = 2n * n.a;
   let e = (n.b % t + t) % t;
   e > n.a ? e -= t : e <= -n.a && (e += t);
@@ -174,7 +184,7 @@ function $(n) {
   return { a: n.a, b: e, c: o, discriminant: n.discriminant };
 }
 function st(n) {
-  let t = $(n);
+  let t = Z(n);
   for (; ; )
     if (t.a > t.c) {
       const e = t.a;
@@ -183,35 +193,38 @@ function st(n) {
         b: -t.b,
         c: e,
         discriminant: t.discriminant
-      }, t = $(t);
+      }, t = Z(t);
     } else {
       t.a === t.c && t.b < 0n && (t = { ...t, b: -t.b });
       break;
     }
   return t;
 }
-function bt(n) {
+function wt(n) {
   const t = 1n, e = (t - n) / 4n;
   return { a: t, b: t, c: e, discriminant: n };
 }
-function G(n, t) {
-  if (t === 0n)
-    return { gcd: n, x: 1n, y: 0n };
-  const { gcd: e, x: s, y: i } = G(t, n % t);
-  return { gcd: e, x: i, y: s - n / t * i };
+function $(n, t) {
+  let e = n, s = t, i = 1n, l = 0n, o = 0n, r = 1n;
+  for (; s !== 0n; ) {
+    const a = e / s;
+    let d = e;
+    e = s, s = d - a * s, d = i, i = l, l = d - a * l, d = o, o = r, r = d - a * r;
+  }
+  return e < 0n && (e = -e, i = -i, o = -o), { gcd: e, x: i, y: o };
 }
 function it(n, t) {
-  const e = n.a, s = t.a, i = n.b, l = t.b, o = t.c, r = (i + l) / 2n, a = G(e, s), g = a.gcd, y = a.y, u = G(g, r), f = u.gcd, c = u.x, m = u.y, _ = c * y, d = m, b = _ * (i - l), F = d * o, U = b - F, E = 2n * e / f;
+  const e = n.a, s = t.a, i = n.b, l = t.b, o = t.c, r = (i + l) / 2n, a = $(e, s), d = a.gcd, g = a.y, u = $(d, r), f = u.gcd, c = u.x, m = u.y, _ = c * g, b = m, y = _ * (i - l), F = b * o, U = y - F, E = 2n * e / f;
   let v = U % E;
   v < 0n && (v += E);
-  const W = v, p = f * f, x = e * s / p, I = s / f * W, M = l + I, j = M * M - n.discriminant, q = x * 4n, H = j / q;
-  return st({ a: x, b: M, c: H, discriminant: n.discriminant });
+  const W = v, p = f * f, M = e * s / p, x = s / f * W, R = l + x, j = R * R - n.discriminant, q = M * 4n, H = j / q;
+  return st({ a: M, b: R, c: H, discriminant: n.discriminant });
 }
 function ot(n) {
   return it(n, n);
 }
 function yt(n, t) {
-  let e = bt(n.discriminant), s = n, i = t;
+  let e = wt(n.discriminant), s = n, i = t;
   for (; i > 0n; )
     i & 1n && (e = it(e, s)), s = ot(s), i >>= 1n;
   return e;
@@ -304,20 +317,20 @@ function gt(n, t) {
     i++;
   let l = B(i, s, t), o = B(n, (s + 1n) / 2n, t), r = B(n, s, t), a = e;
   for (; r !== 1n; ) {
-    let g = r, y = 0n;
-    for (; g !== 1n; )
-      if (g = g * g % t, y++, y === a)
+    let d = r, g = 0n;
+    for (; d !== 1n; )
+      if (d = d * d % t, g++, g === a)
         return 0n;
     let u = l;
-    for (let f = 0n; f < a - y - 1n; f++)
+    for (let f = 0n; f < a - g - 1n; f++)
       u = u * u % t;
-    a = y, l = u * u % t, r = r * l % t, o = o * u % t;
+    a = g, l = u * u % t, r = r * l % t, o = o * u % t;
   }
   return o;
 }
 function _t(n, t) {
   const e = K(n);
-  let s = Y(e);
+  let s = X(e);
   for (; ; ) {
     if (s % 2n === 0n) {
       s++;
@@ -332,7 +345,7 @@ function _t(n, t) {
   }
   const i = s, l = (t % i + i) % i;
   let o = gt(l, i);
-  const r = o % 2n === 0n ? i - o : o, a = r * r, g = i * 4n, u = (a - t) / g;
+  const r = o % 2n === 0n ? i - o : o, a = r * r, d = i * 4n, u = (a - t) / d;
   return st({ a: i, b: r, c: u, discriminant: t });
 }
 function mt(n, t, e) {
@@ -341,12 +354,12 @@ function mt(n, t, e) {
   const r = K(o);
   let a = 0n;
   for (; ; ) {
-    const g = new Uint8Array(8);
-    new DataView(g.buffer).setBigUint64(0, a, !1);
+    const d = new Uint8Array(8);
+    new DataView(d.buffer).setBigUint64(0, a, !1);
     const u = new Uint8Array(r.length + 8);
-    u.set(r, 0), u.set(g, r.length);
+    u.set(r, 0), u.set(d, r.length);
     const f = K(u);
-    let c = Y(f.slice(0, 16));
+    let c = X(f.slice(0, 16));
     if (c |= 1n, rt(c))
       return c;
     a++;
@@ -364,31 +377,31 @@ function pt(n, t, e) {
   const s = n.slice(0, 16), i = 1n << BigInt(t + 2), l = (1n << BigInt(t)) - 1n, o = 1 << t, r = new Array(o);
   for (let c = 0; c < o; c++)
     r[c] = [];
-  const a = Number(i), g = Math.floor(a / 100);
+  const a = Number(i), d = Math.floor(a / 100);
   for (let c = 0; c < a; c++) {
-    const [m, _] = dt(s, BigInt(c), l), d = Number(m), b = Number(_);
-    d !== b && (r[d].push([b, c]), r[b].push([d, c]), e && c % g === 0 && e(Math.floor(c / a * 50)));
+    const [m, _] = dt(s, BigInt(c), l), b = Number(m), y = Number(_);
+    b !== y && (r[b].push([y, c]), r[y].push([b, c]), e && c % d === 0 && e(Math.floor(c / a * 50)));
   }
-  const y = /* @__PURE__ */ new Set(), u = [];
+  const g = /* @__PURE__ */ new Set(), u = [];
   function f(c, m, _) {
-    y.add(c);
-    for (const [d, b] of r[c]) {
-      if (d === m && _ === 41)
-        return [...u, b];
-      if (!y.has(d) && _ < 42) {
-        u.push(b);
-        const F = f(d, m, _ + 1);
+    g.add(c);
+    for (const [b, y] of r[c]) {
+      if (b === m && _ === 41)
+        return [...u, y];
+      if (!g.has(b) && _ < 42) {
+        u.push(y);
+        const F = f(b, m, _ + 1);
         if (F)
           return F;
         u.pop();
       }
     }
-    return y.delete(c), null;
+    return g.delete(c), null;
   }
   for (let c = 0; c < o; c++) {
     if (r[c].length === 0)
       continue;
-    e && c % 1e3 === 0 && e(50 + Math.floor(c / o * 50)), y.clear(), u.length = 0;
+    e && c % 1e3 === 0 && e(50 + Math.floor(c / o * 50)), g.clear(), u.length = 0;
     const m = f(c, c, 0);
     if (m)
       return e && e(100), m;
@@ -396,25 +409,25 @@ function pt(n, t, e) {
   return null;
 }
 function St(n, t, e, s, i) {
-  const l = V(n), o = V(t), a = -Y(o), y = pt(l, s, i ? (p) => i(Math.floor(p * 0.6)) : void 0);
-  if (!y)
+  const l = V(n), o = V(t), a = -X(o), g = pt(l, s, i ? (p) => i(Math.floor(p * 0.6)) : void 0);
+  if (!g)
     throw new Error("No 42-cycle found (try different seed)");
   i && i(60);
-  const u = vt(y), f = _t(u, a);
+  const u = vt(g), f = _t(u, a);
   i && i(65);
   let c = f;
-  const m = 65, d = 90 - m;
+  const m = 65, b = 90 - m;
   for (let p = 0; p < e; p++)
     if (c = ot(c), i && p % 100 === 0) {
-      const x = p / e * d;
-      i(Math.floor(m + x));
+      const M = p / e * b;
+      i(Math.floor(m + M));
     }
   i && i(90);
-  const b = mt(f, c, a), U = Ft(e) / b, E = yt(f, U);
+  const y = mt(f, c, a), U = Ft(e) / y, E = yt(f, U);
   i && i(100);
   const v = N(c), W = N(E);
   return {
-    cycle: y,
+    cycle: g,
     y: Q(v),
     pi: Q(W),
     memory_bytes: (1 << s) * 1200
@@ -457,14 +470,14 @@ function At() {
   }
   return !1;
 }
-let ct = null, C = !1, tt = !0, R = !1;
+let ct = null, C = !1, tt = !0, T = !1;
 try {
-  R = At();
+  T = At();
 } catch (n) {
-  console.warn("Failed to check WASM support, defaulting to false:", n), R = !1;
+  console.warn("Failed to check WASM support, defaulting to false:", n), T = !1;
 }
 async function Ut(n) {
-  if (!R)
+  if (!T)
     return console.warn("WebAssembly not supported in this environment. Using JS fallback."), !1;
   try {
     const t = (await Promise.resolve().then(function() {
@@ -481,13 +494,13 @@ self.onmessage = async (n) => {
   const { type: t, challenge: e, wasm_url: s, force_js: i } = n.data;
   if (t === "SOLVE")
     try {
-      const l = i || !R;
+      const l = i || !T;
       !l && !C && (tt = await Ut(s));
       const o = tt && C && !l;
       self.postMessage({
         type: "STATUS",
         mode: o ? "wasm" : "js",
-        wasmSupported: R
+        wasmSupported: T
       }), console.log(`Starting Zeno Solver (${o ? "WASM" : "JS fallback"})...`);
       let r, a = 0;
       if (o)
@@ -498,19 +511,19 @@ self.onmessage = async (n) => {
           e.graph_bits
         ), a = r.memory_bytes || 0;
       else {
-        const g = (y) => {
+        const d = (g) => {
           if (self.performance?.memory?.usedJSHeapSize) {
             const u = self.performance.memory.usedJSHeapSize;
             u > a && (a = u);
           }
-          self.postMessage({ type: "PROGRESS", percent: y });
+          self.postMessage({ type: "PROGRESS", percent: g });
         };
         r = St(
           e.seed,
           e.discriminant,
           e.vdf,
           e.graph_bits,
-          g
+          d
         ), a === 0 && r.memory_bytes && (a = r.memory_bytes);
       }
       self.postMessage({
@@ -524,23 +537,23 @@ self.onmessage = async (n) => {
     }
   t === "CHECK_WASM" && self.postMessage({
     type: "WASM_STATUS",
-    supported: R,
+    supported: T,
     initialized: C
   });
 };
 let h;
 function Bt(n, t) {
-  return n = n >>> 0, T().subarray(n / 1, n / 1 + t);
+  return n = n >>> 0, I().subarray(n / 1, n / 1 + t);
 }
 function nt(n, t) {
-  return n = n >>> 0, Mt(n, t);
+  return n = n >>> 0, Rt(n, t);
 }
 let k = null;
 function Et() {
   return (k === null || k.byteLength === 0) && (k = new Uint32Array(h.memory.buffer)), k;
 }
 let O = null;
-function T() {
+function I() {
   return (O === null || O.byteLength === 0) && (O = new Uint8Array(h.memory.buffer)), O;
 }
 function lt(n, t) {
@@ -549,15 +562,15 @@ function lt(n, t) {
 }
 function Wt(n, t) {
   const e = t(n.length * 1, 1) >>> 0;
-  return T().set(n, e / 1), S = n.length, e;
+  return I().set(n, e / 1), S = n.length, e;
 }
 function z(n, t, e) {
   if (e === void 0) {
     const r = L.encode(n), a = t(r.length, 1) >>> 0;
-    return T().subarray(a, a + r.length).set(r), S = r.length, a;
+    return I().subarray(a, a + r.length).set(r), S = r.length, a;
   }
   let s = n.length, i = t(s, 1) >>> 0;
-  const l = T();
+  const l = I();
   let o = 0;
   for (; o < s; o++) {
     const r = n.charCodeAt(o);
@@ -567,21 +580,21 @@ function z(n, t, e) {
   }
   if (o !== s) {
     o !== 0 && (n = n.slice(o)), i = e(i, s, s = o + n.length * 3, 1) >>> 0;
-    const r = T().subarray(i + o, i + s), a = L.encodeInto(n, r);
+    const r = I().subarray(i + o, i + s), a = L.encodeInto(n, r);
     o += a.written, i = e(i, s, o, 1) >>> 0;
   }
   return S = o, i;
 }
-function X(n) {
+function G(n) {
   const t = h.__wbindgen_externrefs.get(n);
   return h.__externref_table_dealloc(n), t;
 }
 let D = new TextDecoder("utf-8", { ignoreBOM: !0, fatal: !0 });
 D.decode();
-const xt = 2146435072;
+const Mt = 2146435072;
 let J = 0;
-function Mt(n, t) {
-  return J += t, J >= xt && (D = new TextDecoder("utf-8", { ignoreBOM: !0, fatal: !0 }), D.decode(), J = t), D.decode(T().subarray(n, n + t));
+function Rt(n, t) {
+  return J += t, J >= Mt && (D = new TextDecoder("utf-8", { ignoreBOM: !0, fatal: !0 }), D.decode(), J = t), D.decode(I().subarray(n, n + t));
 }
 const L = new TextEncoder();
 "encodeInto" in L || (L.encodeInto = function(n, t) {
@@ -592,25 +605,25 @@ const L = new TextEncoder();
   };
 });
 let S = 0;
-function Rt() {
+function Tt() {
   return h.get_memory_bytes() >>> 0;
 }
-function Tt(n) {
+function It(n) {
   const t = lt(n, h.__wbindgen_malloc), e = S, s = h.serialize_cycle(t, e);
   var i = Bt(s[0], s[1]).slice();
   return h.__wbindgen_free(s[0], s[1] * 1, 1), i;
 }
-function It(n, t, e, s) {
+function xt(n, t, e, s) {
   const i = z(n, h.__wbindgen_malloc, h.__wbindgen_realloc), l = S, o = z(t, h.__wbindgen_malloc, h.__wbindgen_realloc), r = S, a = h.solve_wasm(i, l, o, r, e, s);
   if (a[2])
-    throw X(a[1]);
-  return X(a[0]);
+    throw G(a[1]);
+  return G(a[0]);
 }
 function kt(n, t, e, s, i, l, o) {
-  const r = z(n, h.__wbindgen_malloc, h.__wbindgen_realloc), a = S, g = lt(t, h.__wbindgen_malloc), y = S, u = z(e, h.__wbindgen_malloc, h.__wbindgen_realloc), f = S, c = z(s, h.__wbindgen_malloc, h.__wbindgen_realloc), m = S, _ = Wt(i, h.__wbindgen_malloc), d = S, b = h.verify_proof(r, a, g, y, u, f, c, m, _, d, l, o);
-  if (b[2])
-    throw X(b[1]);
-  return b[0] !== 0;
+  const r = z(n, h.__wbindgen_malloc, h.__wbindgen_realloc), a = S, d = lt(t, h.__wbindgen_malloc), g = S, u = z(e, h.__wbindgen_malloc, h.__wbindgen_realloc), f = S, c = z(s, h.__wbindgen_malloc, h.__wbindgen_realloc), m = S, _ = Wt(i, h.__wbindgen_malloc), b = S, y = h.verify_proof(r, a, d, g, u, f, c, m, _, b, l, o);
+  if (y[2])
+    throw G(y[1]);
+  return y[0] !== 0;
 }
 const Ot = /* @__PURE__ */ new Set(["basic", "cors", "default"]);
 async function zt(n, t) {
@@ -676,9 +689,9 @@ async function ut(n) {
 var et = /* @__PURE__ */ Object.freeze({
   __proto__: null,
   default: ut,
-  get_memory_bytes: Rt,
+  get_memory_bytes: Tt,
   initSync: Lt,
-  serialize_cycle: Tt,
-  solve_wasm: It,
+  serialize_cycle: It,
+  solve_wasm: xt,
   verify_proof: kt
 });
