@@ -32,6 +32,14 @@ if (fs.existsSync(distClientDir)) {
                 fs.copyFileSync(src, destBenchmark);
             }
 
+            // Sync to docs/ (root) for demo and general usage
+            const destDocs = path.join(rootDir, 'docs', file);
+            if (fs.statSync(src).isDirectory()) {
+                fs.cpSync(src, destDocs, { recursive: true });
+            } else {
+                fs.copyFileSync(src, destDocs);
+            }
+
             // Sync to test/e2e/client
             const testClientDir = path.join(rootDir, 'test/e2e/client');
             if (fs.existsSync(testClientDir)) {
