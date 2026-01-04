@@ -15,7 +15,13 @@ let wasmInitialized = false;
 let useWasm = true;
 
 // Check WASM support on worker initialization
-const wasmSupported = isWasmSupported();
+let wasmSupported = false;
+try {
+    wasmSupported = isWasmSupported();
+} catch (e) {
+    console.warn("Failed to check WASM support, defaulting to false:", e);
+    wasmSupported = false;
+}
 
 async function initWasm(wasmUrl: string): Promise<boolean> {
     if (!wasmSupported) {

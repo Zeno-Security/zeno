@@ -882,6 +882,9 @@ function bytesToHex(bytes: Uint8Array): string {
 
 export function isWasmSupported(): boolean {
     try {
+        // Explicitly check type before access to prevent ReferenceError in strict environments
+        if (typeof WebAssembly === 'undefined') return false;
+
         if (typeof WebAssembly === 'object' &&
             typeof WebAssembly.instantiate === 'function') {
             // Test with minimal valid WASM module
@@ -893,6 +896,7 @@ export function isWasmSupported(): boolean {
         }
     } catch (e) {
         // WASM not available
+        return false;
     }
     return false;
 }
