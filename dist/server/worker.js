@@ -4541,14 +4541,30 @@ var index_default = {
       return new Response(null, { headers: corsHeaders });
     }
     try {
-      if (request.method === "GET" && url.pathname === "/api/health") {
-        return success({ status: "ok" });
+      let pathname = url.pathname.replace(/\/+/g, "/");
+      if (pathname.endsWith("/") && pathname.length > 1) {
+        pathname = pathname.substring(0, pathname.length - 1);
+      }
+      if (request.method === "GET") {
+        if (pathname === "/api/health") return success({ status: "ok" });
+        if (pathname === "/") {
+          return success({
+            status: "ok",
+            service: "Zeno CAPTCHA API",
+            endpoints: [
+              "/api/challenge",
+              "/api/redeem",
+              "/api/verify",
+              "/api/delete"
+            ]
+          });
+        }
       }
       if (request.method === "POST") {
-        if (url.pathname === "/api/challenge") return await handleChallenge(request, env, ctx);
-        if (url.pathname === "/api/redeem") return await handleRedeem(request, env);
-        if (url.pathname === "/api/verify") return await handleVerify(request, env);
-        if (url.pathname === "/api/delete") return await handleDelete(request, env);
+        if (pathname === "/api/challenge") return await handleChallenge(request, env, ctx);
+        if (pathname === "/api/redeem") return await handleRedeem(request, env);
+        if (pathname === "/api/verify") return await handleVerify(request, env);
+        if (pathname === "/api/delete") return await handleDelete(request, env);
       }
       return error("Not Found", 404);
     } catch (e) {

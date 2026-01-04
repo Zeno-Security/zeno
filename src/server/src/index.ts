@@ -150,15 +150,33 @@ export default {
             // The requirement says "For EVERY endpoint... 1. Load Config... 2. Validate Context".
             // Since we need to read body to get site_key, we will do it inside helper wrapper.
 
-            if (request.method === 'GET' && url.pathname === '/api/health') {
-                return success({ status: 'ok' });
+            // Normalize path: replace double slashes and strip trailing slash
+            let pathname = url.pathname.replace(/\/+/g, '/');
+            if (pathname.endsWith('/') && pathname.length > 1) {
+                pathname = pathname.substring(0, pathname.length - 1);
+            }
+
+            if (request.method === 'GET') {
+                if (pathname === '/api/health') return success({ status: 'ok' });
+                if (pathname === '/') {
+                    return success({
+                        status: 'ok',
+                        service: 'Zeno CAPTCHA API',
+                        endpoints: [
+                            '/api/challenge',
+                            '/api/redeem',
+                            '/api/verify',
+                            '/api/delete'
+                        ]
+                    });
+                }
             }
 
             if (request.method === 'POST') {
-                if (url.pathname === '/api/challenge') return await handleChallenge(request, env, ctx);
-                if (url.pathname === '/api/redeem') return await handleRedeem(request, env);
-                if (url.pathname === '/api/verify') return await handleVerify(request, env);
-                if (url.pathname === '/api/delete') return await handleDelete(request, env);
+                if (pathname === '/api/challenge') return await handleChallenge(request, env, ctx);
+                if (pathname === '/api/redeem') return await handleRedeem(request, env);
+                if (pathname === '/api/verify') return await handleVerify(request, env);
+                if (pathname === '/api/delete') return await handleDelete(request, env);
             }
 
             return error('Not Found', 404);
