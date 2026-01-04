@@ -72,7 +72,6 @@
             text-align: left;
         }
 
-        /* Code Viewer - Light IDE Style */
         .code-viewer {
             border-radius: 12px;
             overflow: hidden;
@@ -131,67 +130,73 @@
             display: block;
         }
 
-        /* Syntax Highlighting Colors (VS Code Light Theme) */
-        .tab-content .tag {
-            color: #800000;
-        }
-
-        .tab-content .attr-name {
-            color: #e50000;
-        }
-
-        .tab-content .attr-value {
-            color: #0000ff;
-        }
-
-        .tab-content .comment {
+        /* Syntax Highlighting - VS Code Light Theme */
+        .c {
             color: #008000;
             font-style: italic;
         }
 
-        .tab-content .keyword {
-            color: #af00db;
-        }
-
-        .tab-content .function {
-            color: #795e26;
-        }
-
-        .tab-content .string {
-            color: #a31515;
-        }
-
-        .tab-content .number {
-            color: #098658;
-        }
-
-        .tab-content .property {
-            color: #001080;
-        }
-
-        .tab-content .variable {
-            color: #0070c1;
-        }
-
-        .tab-content .operator {
-            color: #000000;
-        }
-
-        .tab-content .punctuation {
-            color: #000000;
-        }
-
-        .tab-content .selector {
+        /* comment */
+        .t {
             color: #800000;
         }
 
-        .tab-content .css-property {
+        /* tag */
+        .a {
             color: #e50000;
         }
 
-        .tab-content .css-value {
+        /* attr-name */
+        .v {
             color: #0000ff;
         }
+
+        /* attr-value */
+        .k {
+            color: #af00db;
+        }
+
+        /* keyword */
+        .f {
+            color: #795e26;
+        }
+
+        /* function */
+        .s {
+            color: #a31515;
+        }
+
+        /* string */
+        .n {
+            color: #098658;
+        }
+
+        /* number */
+        .p {
+            color: #001080;
+        }
+
+        /* property */
+        .x {
+            color: #0070c1;
+        }
+
+        /* variable */
+        .sel {
+            color: #800000;
+        }
+
+        /* selector */
+        .cp {
+            color: #e50000;
+        }
+
+        /* css-property */
+        .cv {
+            color: #0000ff;
+        }
+
+        /* css-value */
 
         .controls {
             display: grid;
@@ -265,60 +270,9 @@
                     <button class="tab-btn" onclick="openTab(event, 'std-js')">JavaScript</button>
                     <button class="tab-btn" onclick="openTab(event, 'std-css')">CSS</button>
                 </div>
-                <div id="std-html" class="tab-content active"><span class="comment">&lt;!-- Include the Zeno library
-                        --&gt;</span>
-                    <span class="tag">&lt;script</span> <span class="attr-name">type</span>=<span
-                        class="attr-value">"module"</span> <span class="attr-name">src</span>=<span
-                        class="attr-value">"https://cdn.jsdelivr.net/gh/zeno-security/zeno@latest/dist/client/zeno.min.js"</span><span
-                        class="tag">&gt;&lt;/script&gt;</span>
-
-                    <span class="comment">&lt;!-- Add the widget to your page --&gt;</span>
-                    <span class="tag">&lt;zeno-widget</span>
-                    <span class="attr-name">zeno-site-key</span>=<span
-                        class="attr-value">"550e8400-e29b-41d4-a716-446655440000"</span>
-                    <span class="attr-name">zeno-api-endpoint</span>=<span
-                        class="attr-value">"https://zeno.secops.workers.dev/api"</span>
-                    <span class="attr-name">onsolve</span>=<span class="attr-value">"handleSolve(event)"</span>
-                    <span class="tag">&gt;&lt;/zeno-widget&gt;</span>
-                </div>
-                <div id="std-js" class="tab-content"><span class="comment">// Get reference to the widget</span>
-                    <span class="keyword">const</span> widget = document.<span
-                        class="function">querySelector</span>(<span class="string">'zeno-widget'</span>);
-
-                    <span class="comment">// Listen for successful solve</span>
-                    widget.<span class="function">addEventListener</span>(<span class="string">'solve'</span>, (event)
-                    =&gt; {
-                    <span class="keyword">const</span> token = event.detail.token;
-                    console.<span class="function">log</span>(<span class="string">'Verification token:'</span>, token);
-
-                    <span class="comment">// Send token to your server for validation</span>
-                    <span class="function">submitForm</span>(token);
-                    });
-
-                    <span class="comment">// Listen for errors</span>
-                    widget.<span class="function">addEventListener</span>(<span class="string">'error'</span>, (event)
-                    =&gt; {
-                    console.<span class="function">error</span>(<span class="string">'Zeno error:'</span>,
-                    event.detail.message);
-                    });
-                </div>
-                <div id="std-css" class="tab-content"><span class="comment">/* Default styles - no customization needed
-                        */</span>
-                    <span class="comment">/* Widget inherits default theme automatically */</span>
-
-                    <span class="comment">/* Optional: Container styling */</span>
-                    <span class="selector">.form-container</span> {
-                    <span class="css-property">display</span>: <span class="css-value">flex</span>;
-                    <span class="css-property">flex-direction</span>: <span class="css-value">column</span>;
-                    <span class="css-property">gap</span>: <span class="css-value">16px</span>;
-                    <span class="css-property">max-width</span>: <span class="css-value">400px</span>;
-                    }
-
-                    <span class="comment">/* Optional: Adjust widget margin */</span>
-                    <span class="selector">zeno-widget</span> {
-                    <span class="css-property">margin</span>: <span class="css-value">16px 0</span>;
-                    }
-                </div>
+                <div id="std-html" class="tab-content active"></div>
+                <div id="std-js" class="tab-content"></div>
+                <div id="std-css" class="tab-content"></div>
             </div>
         </div>
 
@@ -327,9 +281,7 @@
             <div class="widget-area">
                 <h2>2. Floating Mode</h2>
                 <p style="color:#666; font-size:14px;">Hidden until triggered.</p>
-                <button class="action-btn" zeno-floating="#zeno-float">
-                    Verify Me (Floating)
-                </button>
+                <button class="action-btn" zeno-floating="#zeno-float">Verify Me (Floating)</button>
                 <zeno-widget id="zeno-float" zeno-api-endpoint="https://zeno.secops.workers.dev/api"
                     zeno-site-key="550e8400-e29b-41d4-a716-446655440000" style="display: none;"
                     onsolve="console.log('Floating Solved! Token:', event.detail.token)"></zeno-widget>
@@ -340,74 +292,9 @@
                     <button class="tab-btn" onclick="openTab(event, 'float-js')">JavaScript</button>
                     <button class="tab-btn" onclick="openTab(event, 'float-css')">CSS</button>
                 </div>
-                <div id="float-html" class="tab-content active"><span class="comment">&lt;!-- Trigger button with
-                        zeno-floating attribute --&gt;</span>
-                    <span class="tag">&lt;button</span> <span class="attr-name">zeno-floating</span>=<span
-                        class="attr-value">"#my-widget"</span><span class="tag">&gt;</span>Verify Me<span
-                        class="tag">&lt;/button&gt;</span>
-
-                    <span class="comment">&lt;!-- Hidden widget - shown when button clicked --&gt;</span>
-                    <span class="tag">&lt;zeno-widget</span>
-                    <span class="attr-name">id</span>=<span class="attr-value">"my-widget"</span>
-                    <span class="attr-name">style</span>=<span class="attr-value">"display: none;"</span>
-                    <span class="attr-name">zeno-site-key</span>=<span
-                        class="attr-value">"550e8400-e29b-41d4-a716-446655440000"</span>
-                    <span class="attr-name">zeno-api-endpoint</span>=<span
-                        class="attr-value">"https://zeno.secops.workers.dev/api"</span>
-                    <span class="attr-name">onsolve</span>=<span class="attr-value">"handleFloatingSolve(event)"</span>
-                    <span class="tag">&gt;&lt;/zeno-widget&gt;</span>
-                </div>
-                <div id="float-js" class="tab-content"><span class="comment">// Floating handler is built into the
-                        library</span>
-                    <span class="comment">// Clicking [zeno-floating] triggers the referenced widget</span>
-
-                    <span class="comment">// Custom implementation (if needed):</span>
-                    document.<span class="function">addEventListener</span>(<span class="string">'click'</span>, (e)
-                    =&gt; {
-                    <span class="keyword">const</span> trigger = e.target.<span class="function">closest</span>(<span
-                        class="string">'[zeno-floating]'</span>);
-
-                    <span class="keyword">if</span> (trigger) {
-                    <span class="keyword">const</span> selector = trigger.<span
-                        class="function">getAttribute</span>(<span class="string">'zeno-floating'</span>);
-                    <span class="keyword">const</span> widget = document.<span
-                        class="function">querySelector</span>(selector);
-
-                    <span class="keyword">if</span> (widget) {
-                    widget.style.display = <span class="string">'block'</span>;
-                    }
-                    }
-                    });
-
-                    <span class="comment">// Handle solve event</span>
-                    <span class="keyword">function</span> <span class="function">handleFloatingSolve</span>(event) {
-                    console.<span class="function">log</span>(<span class="string">'Token:'</span>, event.detail.token);
-                    event.target.style.display = <span class="string">'none'</span>;
-                    }
-                </div>
-                <div id="float-css" class="tab-content"><span class="comment">/* Position the floating widget */</span>
-                    <span class="selector">#my-widget</span> {
-                    <span class="css-property">position</span>: <span class="css-value">fixed</span>;
-                    <span class="css-property">bottom</span>: <span class="css-value">20px</span>;
-                    <span class="css-property">right</span>: <span class="css-value">20px</span>;
-                    <span class="css-property">z-index</span>: <span class="css-value">9999</span>;
-                    }
-
-                    <span class="comment">/* Style the trigger button */</span>
-                    <span class="selector">[zeno-floating]</span> {
-                    <span class="css-property">background</span>: <span class="css-value">#007bff</span>;
-                    <span class="css-property">color</span>: <span class="css-value">white</span>;
-                    <span class="css-property">border</span>: <span class="css-value">none</span>;
-                    <span class="css-property">padding</span>: <span class="css-value">12px 24px</span>;
-                    <span class="css-property">border-radius</span>: <span class="css-value">8px</span>;
-                    <span class="css-property">cursor</span>: <span class="css-value">pointer</span>;
-                    <span class="css-property">font-weight</span>: <span class="css-value">600</span>;
-                    }
-
-                    <span class="selector">[zeno-floating]:hover</span> {
-                    <span class="css-property">background</span>: <span class="css-value">#0056b3</span>;
-                    }
-                </div>
+                <div id="float-html" class="tab-content active"></div>
+                <div id="float-js" class="tab-content"></div>
+                <div id="float-css" class="tab-content"></div>
             </div>
         </div>
 
@@ -425,154 +312,53 @@
                     <button class="tab-btn" onclick="openTab(event, 'inv-js')">JavaScript</button>
                     <button class="tab-btn" onclick="openTab(event, 'inv-css')">CSS</button>
                 </div>
-                <div id="inv-html" class="tab-content active"><span class="comment">&lt;!-- No widget element needed for
-                        invisible mode --&gt;</span>
-                    <span class="comment">&lt;!-- Just import the library as a module --&gt;</span>
-
-                    <span class="tag">&lt;script</span> <span class="attr-name">type</span>=<span
-                        class="attr-value">"module"</span><span class="tag">&gt;</span>
-                    <span class="keyword">import</span> { Zeno } <span class="keyword">from</span> <span
-                        class="string">'https://cdn.jsdelivr.net/gh/zeno-security/zeno@latest/dist/client/zeno.min.js'</span>;
-
-                    <span class="comment">// Use Zeno API programmatically</span>
-                    <span class="keyword">const</span> zeno = <span class="keyword">new</span> <span
-                        class="function">Zeno</span>({
-                    apiEndpoint: <span class="string">'https://zeno.secops.workers.dev/api'</span>,
-                    siteKey: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>
-                    });
-                    <span class="tag">&lt;/script&gt;</span>
-                </div>
-                <div id="inv-js" class="tab-content"><span class="keyword">import</span> { Zeno } <span
-                        class="keyword">from</span> <span
-                        class="string">'https://cdn.jsdelivr.net/gh/zeno-security/zeno@latest/dist/client/zeno.min.js'</span>;
-
-                    <span class="keyword">async</span> <span class="keyword">function</span> <span
-                        class="function">protectAction</span>() {
-                    <span class="comment">// Initialize Zeno</span>
-                    <span class="keyword">const</span> zeno = <span class="keyword">new</span> <span
-                        class="function">Zeno</span>({
-                    apiEndpoint: <span class="string">'https://zeno.secops.workers.dev/api'</span>,
-                    siteKey: <span class="string">'550e8400-e29b-41d4-a716-446655440000'</span>
-                    });
-
-                    <span class="keyword">try</span> {
-                    <span class="comment">// Solve invisibly (no UI)</span>
-                    <span class="keyword">const</span> startTime = Date.<span class="function">now</span>();
-                    <span class="keyword">const</span> { token } = <span class="keyword">await</span> zeno.<span
-                        class="function">solve</span>();
-                    <span class="keyword">const</span> duration = (Date.<span class="function">now</span>() - startTime)
-                    / <span class="number">1000</span>;
-
-                    console.<span class="function">log</span>(<span class="string">`Solved in ${duration}s`</span>);
-                    console.<span class="function">log</span>(<span class="string">'Token:'</span>, token);
-
-                    <span class="comment">// Submit token to your server</span>
-                    <span class="keyword">return</span> token;
-                    } <span class="keyword">catch</span> (error) {
-                    console.<span class="function">error</span>(<span class="string">'Verification failed:'</span>,
-                    error);
-                    <span class="keyword">throw</span> error;
-                    }
-                    }
-                </div>
-                <div id="inv-css" class="tab-content"><span class="comment">/* No CSS needed for invisible mode
-                        */</span>
-                    <span class="comment">/* The solve happens entirely in the background */</span>
-
-                    <span class="comment">/* Optional: Show loading state on your button */</span>
-                    <span class="selector">.btn-loading</span> {
-                    <span class="css-property">opacity</span>: <span class="css-value">0.7</span>;
-                    <span class="css-property">pointer-events</span>: <span class="css-value">none</span>;
-                    }
-
-                    <span class="selector">.btn-loading::after</span> {
-                    <span class="css-property">content</span>: <span class="css-value">'...'</span>;
-                    <span class="css-property">animation</span>: <span class="css-value">dots 1s infinite</span>;
-                    }
-
-                    <span class="selector">@keyframes dots</span> {
-                    0%, 20% { <span class="css-property">content</span>: <span class="css-value">'.'</span>; }
-                    40% { <span class="css-property">content</span>: <span class="css-value">'..'</span>; }
-                    60%, 100% { <span class="css-property">content</span>: <span class="css-value">'...'</span>; }
-                    }
-                </div>
+                <div id="inv-html" class="tab-content active"></div>
+                <div id="inv-js" class="tab-content"></div>
+                <div id="inv-css" class="tab-content"></div>
             </div>
         </div>
 
         <!-- 4. Styling Playground -->
         <div class="demo-row" style="display: flex; flex-direction: column; gap: 30px;">
             <h2>4. Styling Playground</h2>
-
             <div
                 style="margin: 30px 0; padding: 40px; background: #fafafa; border: 1px dashed #ddd; border-radius: 12px; display: flex; justify-content: center; align-items: center;">
                 <zeno-widget id="zeno-style" zeno-api-endpoint="https://zeno.secops.workers.dev/api"
                     zeno-site-key="550e8400-e29b-41d4-a716-446655440000"></zeno-widget>
             </div>
-
             <div class="controls" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 30px;">
-                <div>
-                    <label>--zeno-background</label>
-                    <input type="text" value="#1a1a1a" oninput="updateStyle('--zeno-background', this.value)">
-                </div>
-                <div>
-                    <label>--zeno-color</label>
-                    <input type="text" value="#ffffff" oninput="updateStyle('--zeno-color', this.value)">
-                </div>
-                <div>
-                    <label>--zeno-border-radius</label>
-                    <input type="text" value="26px" oninput="updateStyle('--zeno-border-radius', this.value)">
-                </div>
-                <div>
-                    <label>--zeno-background-hover</label>
-                    <input type="text" value="#1a1a1a" oninput="updateStyle('--zeno-background-hover', this.value)">
-                </div>
-                <div>
-                    <label>--zeno-border-color</label>
-                    <input type="text" value="#444" oninput="updateStyle('--zeno-border-color', this.value)">
-                </div>
-                <div>
-                    <label>--zeno-widget-height</label>
-                    <input type="text" value="52px" oninput="updateStyle('--zeno-widget-height', this.value)">
-                </div>
-                <div>
-                    <label>--zeno-widget-width</label>
-                    <input type="text" value="260px" oninput="updateStyle('--zeno-widget-width', this.value)">
-                </div>
-                <div>
-                    <label>--zeno-widget-padding</label>
-                    <input type="text" value="12px" oninput="updateStyle('--zeno-widget-padding', this.value)">
-                </div>
-                <div>
-                    <label>--zeno-checkbox-background</label>
-                    <input type="text" value="#333" oninput="updateStyle('--zeno-checkbox-background', this.value)">
-                </div>
-                <div>
-                    <label>--zeno-checkbox-border</label>
-                    <input type="text" value="1px solid #555"
-                        oninput="updateStyle('--zeno-checkbox-border', this.value)">
-                </div>
-                <div>
-                    <label>--zeno-checkbox-border-radius</label>
-                    <input type="text" value="8px" oninput="updateStyle('--zeno-checkbox-border-radius', this.value)">
-                </div>
-                <div>
-                    <label>--zeno-checkbox-size</label>
-                    <input type="text" value="24px" oninput="updateStyle('--zeno-checkbox-size', this.value)">
-                </div>
-                <div style="grid-column: span 2">
-                    <label>--zeno-font</label>
-                    <input type="text" value="system-ui" oninput="updateStyle('--zeno-font', this.value)">
-                </div>
-                <div style="grid-column: span 2">
-                    <label>--zeno-i18n-wasm-banner</label>
-                    <input type="text" value='"Enable WASM for significantly faster solving"'
-                        oninput="updateStyle('--zeno-i18n-wasm-banner', this.value)">
-                </div>
-                <div style="grid-column: span 2">
-                    <label>--zeno-i18n-js-mode-label</label>
-                    <input type="text" value='"Running in compatibility mode"'
-                        oninput="updateStyle('--zeno-i18n-js-mode-label', this.value)">
-                </div>
+                <div><label>--zeno-background</label><input type="text" value="#1a1a1a"
+                        oninput="updateStyle('--zeno-background', this.value)"></div>
+                <div><label>--zeno-color</label><input type="text" value="#ffffff"
+                        oninput="updateStyle('--zeno-color', this.value)"></div>
+                <div><label>--zeno-border-radius</label><input type="text" value="26px"
+                        oninput="updateStyle('--zeno-border-radius', this.value)"></div>
+                <div><label>--zeno-background-hover</label><input type="text" value="#1a1a1a"
+                        oninput="updateStyle('--zeno-background-hover', this.value)"></div>
+                <div><label>--zeno-border-color</label><input type="text" value="#444"
+                        oninput="updateStyle('--zeno-border-color', this.value)"></div>
+                <div><label>--zeno-widget-height</label><input type="text" value="52px"
+                        oninput="updateStyle('--zeno-widget-height', this.value)"></div>
+                <div><label>--zeno-widget-width</label><input type="text" value="260px"
+                        oninput="updateStyle('--zeno-widget-width', this.value)"></div>
+                <div><label>--zeno-widget-padding</label><input type="text" value="12px"
+                        oninput="updateStyle('--zeno-widget-padding', this.value)"></div>
+                <div><label>--zeno-checkbox-background</label><input type="text" value="#333"
+                        oninput="updateStyle('--zeno-checkbox-background', this.value)"></div>
+                <div><label>--zeno-checkbox-border</label><input type="text" value="1px solid #555"
+                        oninput="updateStyle('--zeno-checkbox-border', this.value)"></div>
+                <div><label>--zeno-checkbox-border-radius</label><input type="text" value="8px"
+                        oninput="updateStyle('--zeno-checkbox-border-radius', this.value)"></div>
+                <div><label>--zeno-checkbox-size</label><input type="text" value="24px"
+                        oninput="updateStyle('--zeno-checkbox-size', this.value)"></div>
+                <div style="grid-column: span 2"><label>--zeno-font</label><input type="text" value="system-ui"
+                        oninput="updateStyle('--zeno-font', this.value)"></div>
+                <div style="grid-column: span 2"><label>--zeno-i18n-wasm-banner</label><input type="text"
+                        value='"Enable WASM for significantly faster solving"'
+                        oninput="updateStyle('--zeno-i18n-wasm-banner', this.value)"></div>
+                <div style="grid-column: span 2"><label>--zeno-i18n-js-mode-label</label><input type="text"
+                        value='"Running in compatibility mode"'
+                        oninput="updateStyle('--zeno-i18n-js-mode-label', this.value)"></div>
             </div>
         </div>
 
@@ -591,68 +377,9 @@
                     <button class="tab-btn" onclick="openTab(event, 'js-js')">JavaScript</button>
                     <button class="tab-btn" onclick="openTab(event, 'js-css')">CSS</button>
                 </div>
-                <div id="js-html" class="tab-content active"><span class="comment">&lt;!-- Force JavaScript-only mode
-                        (no WASM) --&gt;</span>
-                    <span class="comment">&lt;!-- Useful for environments where WASM is blocked --&gt;</span>
-
-                    <span class="tag">&lt;zeno-widget</span>
-                    <span class="attr-name">zeno-site-key</span>=<span
-                        class="attr-value">"550e8400-e29b-41d4-a716-446655440000"</span>
-                    <span class="attr-name">zeno-api-endpoint</span>=<span
-                        class="attr-value">"https://zeno.secops.workers.dev/api"</span>
-                    <span class="attr-name">zeno-force-js</span> <span class="comment">&lt;!-- Forces JS-only mode
-                        --&gt;</span>
-                    <span class="attr-name">onsolve</span>=<span class="attr-value">"handleSolve(event)"</span>
-                    <span class="tag">&gt;&lt;/zeno-widget&gt;</span>
-
-                    <span class="comment">&lt;!-- Widget displays compatibility mode banner --&gt;</span>
-                    <span class="comment">&lt;!-- Solving will be slower but still functional --&gt;</span>
-                </div>
-                <div id="js-js" class="tab-content"><span class="comment">// No special JavaScript needed</span>
-                    <span class="comment">// The 'zeno-force-js' attribute handles everything</span>
-
-                    <span class="comment">// The widget automatically:</span>
-                    <span class="comment">// 1. Skips WASM initialization</span>
-                    <span class="comment">// 2. Uses pure JavaScript solver</span>
-                    <span class="comment">// 3. Shows "compatibility mode" banner</span>
-
-                    <span class="comment">// Handle solve event normally</span>
-                    <span class="keyword">function</span> <span class="function">handleSolve</span>(event) {
-                    <span class="keyword">const</span> token = event.detail.token;
-                    console.<span class="function">log</span>(<span class="string">'JS Mode Token:'</span>, token);
-
-                    <span class="comment">// Token works identically to WASM mode</span>
-                    <span class="function">submitToServer</span>(token);
-                    }
-
-                    <span class="comment">// For invisible API, use forceJS option:</span>
-                    <span class="keyword">const</span> zeno = <span class="keyword">new</span> <span
-                        class="function">Zeno</span>({
-                    apiEndpoint: <span class="string">'...'</span>,
-                    siteKey: <span class="string">'...'</span>,
-                    forceJS: <span class="keyword">true</span>
-                    });
-                </div>
-                <div id="js-css" class="tab-content"><span class="comment">/* Customize the compatibility mode banner
-                        */</span>
-
-                    <span class="comment">/* Override banner text via CSS variable */</span>
-                    <span class="selector">zeno-widget[zeno-force-js]</span> {
-                    <span class="css-property">--zeno-i18n-js-mode-label</span>: <span class="css-value">"Running in
-                        compatibility mode"</span>;
-                    <span class="css-property">--zeno-i18n-wasm-banner</span>: <span class="css-value">"Enable WASM for
-                        faster solving"</span>;
-                    }
-
-                    <span class="comment">/* Optional: Style the banner differently */</span>
-                    <span class="selector">zeno-widget[zeno-force-js]::part(banner)</span> {
-                    <span class="css-property">background</span>: <span class="css-value">#fff3cd</span>;
-                    <span class="css-property">color</span>: <span class="css-value">#856404</span>;
-                    <span class="css-property">padding</span>: <span class="css-value">8px 12px</span>;
-                    <span class="css-property">font-size</span>: <span class="css-value">12px</span>;
-                    <span class="css-property">border-radius</span>: <span class="css-value">4px</span>;
-                    }
-                </div>
+                <div id="js-html" class="tab-content active"></div>
+                <div id="js-js" class="tab-content"></div>
+                <div id="js-css" class="tab-content"></div>
             </div>
         </div>
 
@@ -660,7 +387,230 @@
 
     <script type="module" src="../zeno.min.js"></script>
     <script>
-        console.log("Zeno Lib Initialized (v11)");
+        // Code content definitions
+        const codeContent = {
+            'std-html': `<span class="c">&lt;!-- Include the Zeno library --&gt;</span>
+<span class="t">&lt;script</span> <span class="a">type</span>=<span class="v">"module"</span> <span class="a">src</span>=<span class="v">"https://cdn.jsdelivr.net/gh/zeno-security/zeno@latest/dist/client/zeno.min.js"</span><span class="t">&gt;&lt;/script&gt;</span>
+
+<span class="c">&lt;!-- Add the widget to your page --&gt;</span>
+<span class="t">&lt;zeno-widget</span>
+    <span class="a">zeno-site-key</span>=<span class="v">"550e8400-e29b-41d4-a716-446655440000"</span>
+    <span class="a">zeno-api-endpoint</span>=<span class="v">"https://zeno.secops.workers.dev/api"</span>
+    <span class="a">onsolve</span>=<span class="v">"handleSolve(event)"</span>
+<span class="t">&gt;&lt;/zeno-widget&gt;</span>`,
+
+            'std-js': `<span class="c">// Get reference to the widget</span>
+<span class="k">const</span> widget = document.<span class="f">querySelector</span>(<span class="s">'zeno-widget'</span>);
+
+<span class="c">// Listen for successful solve</span>
+widget.<span class="f">addEventListener</span>(<span class="s">'solve'</span>, (event) =&gt; {
+    <span class="k">const</span> token = event.detail.token;
+    console.<span class="f">log</span>(<span class="s">'Verification token:'</span>, token);
+
+    <span class="c">// Send token to your server for validation</span>
+    <span class="f">submitForm</span>(token);
+});
+
+<span class="c">// Listen for errors</span>
+widget.<span class="f">addEventListener</span>(<span class="s">'error'</span>, (event) =&gt; {
+    console.<span class="f">error</span>(<span class="s">'Zeno error:'</span>, event.detail.message);
+});`,
+
+            'std-css': `<span class="c">/* Default styles - no customization needed */</span>
+<span class="c">/* Widget inherits default theme automatically */</span>
+
+<span class="c">/* Optional: Container styling */</span>
+<span class="sel">.form-container</span> {
+    <span class="cp">display</span>: <span class="cv">flex</span>;
+    <span class="cp">flex-direction</span>: <span class="cv">column</span>;
+    <span class="cp">gap</span>: <span class="cv">16px</span>;
+    <span class="cp">max-width</span>: <span class="cv">400px</span>;
+}
+
+<span class="c">/* Optional: Adjust widget margin */</span>
+<span class="sel">zeno-widget</span> {
+    <span class="cp">margin</span>: <span class="cv">16px 0</span>;
+}`,
+
+            'float-html': `<span class="c">&lt;!-- Trigger button with zeno-floating attribute --&gt;</span>
+<span class="t">&lt;button</span> <span class="a">zeno-floating</span>=<span class="v">"#my-widget"</span><span class="t">&gt;</span>Verify Me<span class="t">&lt;/button&gt;</span>
+
+<span class="c">&lt;!-- Hidden widget - shown when button clicked --&gt;</span>
+<span class="t">&lt;zeno-widget</span>
+    <span class="a">id</span>=<span class="v">"my-widget"</span>
+    <span class="a">style</span>=<span class="v">"display: none;"</span>
+    <span class="a">zeno-site-key</span>=<span class="v">"550e8400-e29b-41d4-a716-446655440000"</span>
+    <span class="a">zeno-api-endpoint</span>=<span class="v">"https://zeno.secops.workers.dev/api"</span>
+    <span class="a">onsolve</span>=<span class="v">"handleFloatingSolve(event)"</span>
+<span class="t">&gt;&lt;/zeno-widget&gt;</span>`,
+
+            'float-js': `<span class="c">// Floating handler is built into the library</span>
+<span class="c">// Clicking [zeno-floating] triggers the referenced widget</span>
+
+<span class="c">// Custom implementation (if needed):</span>
+document.<span class="f">addEventListener</span>(<span class="s">'click'</span>, (e) =&gt; {
+    <span class="k">const</span> trigger = e.target.<span class="f">closest</span>(<span class="s">'[zeno-floating]'</span>);
+
+    <span class="k">if</span> (trigger) {
+        <span class="k">const</span> selector = trigger.<span class="f">getAttribute</span>(<span class="s">'zeno-floating'</span>);
+        <span class="k">const</span> widget = document.<span class="f">querySelector</span>(selector);
+
+        <span class="k">if</span> (widget) {
+            widget.style.display = <span class="s">'block'</span>;
+        }
+    }
+});
+
+<span class="c">// Handle solve event</span>
+<span class="k">function</span> <span class="f">handleFloatingSolve</span>(event) {
+    console.<span class="f">log</span>(<span class="s">'Token:'</span>, event.detail.token);
+    event.target.style.display = <span class="s">'none'</span>;
+}`,
+
+            'float-css': `<span class="c">/* Position the floating widget */</span>
+<span class="sel">#my-widget</span> {
+    <span class="cp">position</span>: <span class="cv">fixed</span>;
+    <span class="cp">bottom</span>: <span class="cv">20px</span>;
+    <span class="cp">right</span>: <span class="cv">20px</span>;
+    <span class="cp">z-index</span>: <span class="cv">9999</span>;
+}
+
+<span class="c">/* Style the trigger button */</span>
+<span class="sel">[zeno-floating]</span> {
+    <span class="cp">background</span>: <span class="cv">#007bff</span>;
+    <span class="cp">color</span>: <span class="cv">white</span>;
+    <span class="cp">border</span>: <span class="cv">none</span>;
+    <span class="cp">padding</span>: <span class="cv">12px 24px</span>;
+    <span class="cp">border-radius</span>: <span class="cv">8px</span>;
+    <span class="cp">cursor</span>: <span class="cv">pointer</span>;
+    <span class="cp">font-weight</span>: <span class="cv">600</span>;
+}
+
+<span class="sel">[zeno-floating]:hover</span> {
+    <span class="cp">background</span>: <span class="cv">#0056b3</span>;
+}`,
+
+            'inv-html': `<span class="c">&lt;!-- No widget element needed for invisible mode --&gt;</span>
+<span class="c">&lt;!-- Just import the library as a module --&gt;</span>
+
+<span class="t">&lt;script</span> <span class="a">type</span>=<span class="v">"module"</span><span class="t">&gt;</span>
+    <span class="k">import</span> { Zeno } <span class="k">from</span> <span class="s">'https://cdn.jsdelivr.net/gh/zeno-security/zeno@latest/dist/client/zeno.min.js'</span>;
+
+    <span class="c">// Use Zeno API programmatically</span>
+    <span class="k">const</span> zeno = <span class="k">new</span> <span class="f">Zeno</span>({
+        apiEndpoint: <span class="s">'https://zeno.secops.workers.dev/api'</span>,
+        siteKey: <span class="s">'550e8400-e29b-41d4-a716-446655440000'</span>
+    });
+<span class="t">&lt;/script&gt;</span>`,
+
+            'inv-js': `<span class="k">import</span> { Zeno } <span class="k">from</span> <span class="s">'https://cdn.jsdelivr.net/gh/zeno-security/zeno@latest/dist/client/zeno.min.js'</span>;
+
+<span class="k">async</span> <span class="k">function</span> <span class="f">protectAction</span>() {
+    <span class="c">// Initialize Zeno</span>
+    <span class="k">const</span> zeno = <span class="k">new</span> <span class="f">Zeno</span>({
+        apiEndpoint: <span class="s">'https://zeno.secops.workers.dev/api'</span>,
+        siteKey: <span class="s">'550e8400-e29b-41d4-a716-446655440000'</span>
+    });
+
+    <span class="k">try</span> {
+        <span class="c">// Solve invisibly (no UI)</span>
+        <span class="k">const</span> startTime = Date.<span class="f">now</span>();
+        <span class="k">const</span> { token } = <span class="k">await</span> zeno.<span class="f">solve</span>();
+        <span class="k">const</span> duration = (Date.<span class="f">now</span>() - startTime) / <span class="n">1000</span>;
+
+        console.<span class="f">log</span>(<span class="s">\`Solved in \${duration}s\`</span>);
+        console.<span class="f">log</span>(<span class="s">'Token:'</span>, token);
+
+        <span class="c">// Submit token to your server</span>
+        <span class="k">return</span> token;
+    } <span class="k">catch</span> (error) {
+        console.<span class="f">error</span>(<span class="s">'Verification failed:'</span>, error);
+        <span class="k">throw</span> error;
+    }
+}`,
+
+            'inv-css': `<span class="c">/* No CSS needed for invisible mode */</span>
+<span class="c">/* The solve happens entirely in the background */</span>
+
+<span class="c">/* Optional: Show loading state on your button */</span>
+<span class="sel">.btn-loading</span> {
+    <span class="cp">opacity</span>: <span class="cv">0.7</span>;
+    <span class="cp">pointer-events</span>: <span class="cv">none</span>;
+}
+
+<span class="sel">.btn-loading::after</span> {
+    <span class="cp">content</span>: <span class="cv">'...'</span>;
+    <span class="cp">animation</span>: <span class="cv">dots 1s infinite</span>;
+}
+
+<span class="sel">@keyframes dots</span> {
+    0%, 20% { <span class="cp">content</span>: <span class="cv">'.'</span>; }
+    40% { <span class="cp">content</span>: <span class="cv">'..'</span>; }
+    60%, 100% { <span class="cp">content</span>: <span class="cv">'...'</span>; }
+}`,
+
+            'js-html': `<span class="c">&lt;!-- Force JavaScript-only mode (no WASM) --&gt;</span>
+<span class="c">&lt;!-- Useful for environments where WASM is blocked --&gt;</span>
+
+<span class="t">&lt;zeno-widget</span>
+    <span class="a">zeno-site-key</span>=<span class="v">"550e8400-e29b-41d4-a716-446655440000"</span>
+    <span class="a">zeno-api-endpoint</span>=<span class="v">"https://zeno.secops.workers.dev/api"</span>
+    <span class="a">zeno-force-js</span>  <span class="c">&lt;!-- Forces JS-only mode --&gt;</span>
+    <span class="a">onsolve</span>=<span class="v">"handleSolve(event)"</span>
+<span class="t">&gt;&lt;/zeno-widget&gt;</span>
+
+<span class="c">&lt;!-- Widget displays compatibility mode banner --&gt;</span>
+<span class="c">&lt;!-- Solving will be slower but still functional --&gt;</span>`,
+
+            'js-js': `<span class="c">// No special JavaScript needed</span>
+<span class="c">// The 'zeno-force-js' attribute handles everything</span>
+
+<span class="c">// The widget automatically:</span>
+<span class="c">// 1. Skips WASM initialization</span>
+<span class="c">// 2. Uses pure JavaScript solver</span>
+<span class="c">// 3. Shows "compatibility mode" banner</span>
+
+<span class="c">// Handle solve event normally</span>
+<span class="k">function</span> <span class="f">handleSolve</span>(event) {
+    <span class="k">const</span> token = event.detail.token;
+    console.<span class="f">log</span>(<span class="s">'JS Mode Token:'</span>, token);
+
+    <span class="c">// Token works identically to WASM mode</span>
+    <span class="f">submitToServer</span>(token);
+}
+
+<span class="c">// For invisible API, use forceJS option:</span>
+<span class="k">const</span> zeno = <span class="k">new</span> <span class="f">Zeno</span>({
+    apiEndpoint: <span class="s">'...'</span>,
+    siteKey: <span class="s">'...'</span>,
+    forceJS: <span class="k">true</span>
+});`,
+
+            'js-css': `<span class="c">/* Customize the compatibility mode banner */</span>
+
+<span class="c">/* Override banner text via CSS variable */</span>
+<span class="sel">zeno-widget[zeno-force-js]</span> {
+    <span class="cp">--zeno-i18n-js-mode-label</span>: <span class="cv">"Running in compatibility mode"</span>;
+    <span class="cp">--zeno-i18n-wasm-banner</span>: <span class="cv">"Enable WASM for faster solving"</span>;
+}
+
+<span class="c">/* Optional: Style the banner differently */</span>
+<span class="sel">zeno-widget[zeno-force-js]::part(banner)</span> {
+    <span class="cp">background</span>: <span class="cv">#fff3cd</span>;
+    <span class="cp">color</span>: <span class="cv">#856404</span>;
+    <span class="cp">padding</span>: <span class="cv">8px 12px</span>;
+    <span class="cp">font-size</span>: <span class="cv">12px</span>;
+    <span class="cp">border-radius</span>: <span class="cv">4px</span>;
+}`
+        };
+
+        // Populate code content
+        document.addEventListener('DOMContentLoaded', () => {
+            Object.keys(codeContent).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = codeContent[id];
+            });
+        });
 
         function openTab(evt, tabId) {
             const viewer = evt.currentTarget.closest('.code-viewer');
@@ -682,7 +632,6 @@
     <script type="module">
         import { Zeno } from './zeno.min.js';
 
-        // Invisible Mode Logic
         document.addEventListener('DOMContentLoaded', () => {
             const btn = document.getElementById('btn-invisible');
             if (btn) {
@@ -705,7 +654,6 @@
                 });
             }
 
-            // Initialize styling playground
             const widget = document.getElementById('zeno-style');
             if (widget) {
                 widget.style.setProperty('--zeno-background', '#1a1a1a');
@@ -725,16 +673,12 @@
 
         window.updateStyle = (varName, value) => {
             const widget = document.getElementById('zeno-style');
-            if (widget) {
-                widget.style.setProperty(varName, value);
-            }
+            if (widget) widget.style.setProperty(varName, value);
         };
 
         window.updateAttribute = (attrName, value) => {
             const widget = document.getElementById('zeno-style');
-            if (widget) {
-                widget.setAttribute(attrName, value);
-            }
+            if (widget) widget.setAttribute(attrName, value);
         };
     </script>
 </body>
