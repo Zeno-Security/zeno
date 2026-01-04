@@ -109,14 +109,25 @@ Invalidates a session token manually (e.g. on user logout).
 ### Widget Attributes
 The `<zeno-widget>` supports extensive customization via attributes:
 
+### Internationalization (i18n)
+You can customize the text labels using attributes or CSS variables (useful for styling/theming).
+
+**Attributes (Standard):**
+- `zeno-i18n-human-label`: Default "I am human"
+- `zeno-i18n-verifying-label`: Default "Verifying..."
+- `zeno-i18n-solved-label`: Default "Success!"
+- `zeno-i18n-error-label`: Default "Error"
+
+**CSS Variables (Styling/Content):**
+- `--zeno-i18n-wasm-banner`: Text for the red banner in JS fallback mode.
+  - *Example:* `--zeno-i18n-wasm-banner: "Please enable WASM"`
+- `--zeno-i18n-js-mode-label`: Text for the compatibility mode sublabel.
+  - *Example:* `--zeno-i18n-js-mode-label: "Slow Mode Active"`
+
+> **Note:** CSS variable values must be quoted strings if passing text content via proper CSS syntax, though the widget creates robustness by stripping quotes if present.
+
 | Attribute | Description | Default |
 | :--- | :--- | :--- |
-| `zeno-i18n-human-label` | Main checkbox label | "I am human" |
-| `zeno-i18n-verifying-label` | Label during processing | "Verifying..." |
-| `zeno-i18n-solved-label` | Label on success | "Success!" |
-| `zeno-i18n-error-label` | Label on error | "Error" |
-| `zeno-i18n-wasm-banner` | Text for the red banner shown in JS fallback mode | "Enable WASM for significantly faster solving" |
-| `zeno-i18n-js-mode-label` | Sublabel shown in JS fallback mode | "Running in compatibility mode" |
 | `zeno-floating` | Selector for the element that triggers the popover (e.g. `#my-button`) | `null` |
 
 ### Events

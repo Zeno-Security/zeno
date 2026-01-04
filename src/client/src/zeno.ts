@@ -447,7 +447,8 @@ class ZenoWidget extends HTMLElement {
     private showWasmBanner() {
         if (this.wasmBanner) {
             this.wasmBanner.classList.add('visible');
-            this.wasmBanner.innerText = this.getAttribute('zeno-i18n-wasm-banner') || "Enable WASM for significantly faster solving";
+            const cssVal = this.readCssVar('--zeno-i18n-wasm-banner');
+            this.wasmBanner.innerText = cssVal || this.getAttribute('zeno-i18n-wasm-banner') || "Enable WASM for significantly faster solving";
             this.container?.classList.add('has-banner');
         }
     }
@@ -467,6 +468,19 @@ class ZenoWidget extends HTMLElement {
     }
 
     private updateFooterContrast() {
+        // Also update dynamic texts if they are visible
+        if (this.wasmBanner && this.wasmBanner.classList.contains('visible')) {
+            const cssVal = this.readCssVar('--zeno-i18n-wasm-banner');
+            const fallback = this.getAttribute('zeno-i18n-wasm-banner') || "Enable WASM for significantly faster solving";
+            this.wasmBanner.innerText = cssVal || fallback;
+        }
+
+        if (this.sublabel && this.sublabel.classList.contains('visible')) {
+            const cssVal = this.readCssVar('--zeno-i18n-js-mode-label');
+            const fallback = this.getAttribute('zeno-i18n-js-mode-label') || "Running in compatibility mode";
+            this.sublabel.innerText = cssVal || fallback;
+        }
+
         const bg = getComputedStyle(this).getPropertyValue('--zeno-background').trim();
         const contrastColor = this.getContrastColor(bg);
         const footer = this.shadow.querySelector('.footer') as HTMLElement;
@@ -474,6 +488,13 @@ class ZenoWidget extends HTMLElement {
             footer.style.setProperty('color', contrastColor, 'important');
             footer.style.setProperty('text-decoration-color', contrastColor, 'important');
         }
+    }
+
+    private readCssVar(varName: string): string | null {
+        const val = getComputedStyle(this).getPropertyValue(varName).trim();
+        if (!val || val === 'none') return null;
+        // Strip quotes if present (CSS content often has them)
+        return val.replace(/^['"](.*)['"]$/, '$1');
     }
 
     private getContrastColor(hexColor: string): string {
@@ -543,7 +564,8 @@ class ZenoWidget extends HTMLElement {
                     this.showWasmBanner();
                     // Show sublabel indicating JS mode
                     if (this.sublabel) {
-                        this.sublabel.innerText = this.getAttribute('zeno-i18n-js-mode-label') || "Running in compatibility mode";
+                        const cssVal = this.readCssVar('--zeno-i18n-js-mode-label');
+                        this.sublabel.innerText = cssVal || this.getAttribute('zeno-i18n-js-mode-label') || "Running in compatibility mode";
                         this.sublabel.classList.add('visible');
                     }
                 }
