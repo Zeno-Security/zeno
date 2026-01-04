@@ -127,7 +127,18 @@ export class Zeno extends EventTarget {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
-        if (!res.ok) throw new Error(`Redeem failed: ${res.statusText}`);
+        if (!res.ok) {
+            let details = res.statusText;
+            try {
+                const errBody = await res.json();
+                if (errBody.error) details += ` (${errBody.error})`;
+                else if (errBody.message) details += ` (${errBody.message})`;
+                else details += ` (${JSON.stringify(errBody)})`;
+            } catch (e) {
+                // ignore
+            }
+            throw new Error(`Redeem failed: ${details}`);
+        }
         const data = await res.json();
         return data.token;
     }
