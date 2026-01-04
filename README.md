@@ -18,6 +18,10 @@ Attackers need 32GB RAM for 1,000 parallel threads.
   - **Standard**: In-page widget.
   - **Floating**: Corner popup.
   - **Invisible**: Background verification for seamless UX.
+- **Universal Compatibility**:
+  - **Pure JS Fallback**: Automatically activates on devices without WebAssembly support.
+  - **Force Mode**: Option to strictly enforce JS or WASM for testing.
+- **Internationalization (i18n)**: Fully customizable strings and styling via CSS variables.
 
 ## Demo
 
@@ -99,8 +103,9 @@ npx wrangler deploy
 Zeno consists of three main components:
 
 1.  **Core (Rust/WASM)**: Handles Cuckatoo Graph generation and Class Group VDF computation.
-2.  **Server (Cloudflare Worker)**: Issues challenges, verifies proofs, and manages storage via R2.
-3.  **Client (TypeScript)**: A lightweight Web Component (`<zeno-widget>`) that orchestrates the solving process in a web worker.
+2.  **Solver (WASM + JS)**: Dual-mode solver ensures 100% device compatibility (WASM primary, Pure JS fallback).
+3.  **Server (Cloudflare Worker)**: Issues challenges, verifies proofs, and manages storage via R2.
+4.  **Client (TypeScript)**: A lightweight Web Component (`<zeno-widget>`) that orchestrates the solving process in a web worker.
 
 ## Development
 
