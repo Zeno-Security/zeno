@@ -130,15 +130,15 @@ function Y(e) {
     for (let b = 0; b < 16; b++)
       a[b] = u[h + b * 4] << 24 | u[h + b * 4 + 1] << 16 | u[h + b * 4 + 2] << 8 | u[h + b * 4 + 3];
     for (let b = 16; b < 64; b++) {
-      const M = (F(a[b - 15], 7) ^ F(a[b - 15], 18) ^ a[b - 15] >>> 3) >>> 0, R = (F(a[b - 2], 17) ^ F(a[b - 2], 19) ^ a[b - 2] >>> 10) >>> 0;
-      a[b] = a[b - 16] + M + a[b - 7] + R >>> 0;
+      const W = (F(a[b - 15], 7) ^ F(a[b - 15], 18) ^ a[b - 15] >>> 3) >>> 0, R = (F(a[b - 2], 17) ^ F(a[b - 2], 19) ^ a[b - 2] >>> 10) >>> 0;
+      a[b] = a[b - 16] + W + a[b - 7] + R >>> 0;
     }
-    let y = t, S = n, A = s, W = r, v = o, B = i, x = c, I = l;
+    let y = t, S = n, A = s, M = r, v = o, B = i, x = c, I = l;
     for (let b = 0; b < 64; b++) {
-      const M = (F(v, 6) ^ F(v, 11) ^ F(v, 25)) >>> 0, R = (v & B ^ ~v & x) >>> 0, N = I + M + R + mt[b] + a[b] >>> 0, P = (F(y, 2) ^ F(y, 13) ^ F(y, 22)) >>> 0, K = (y & S ^ y & A ^ S & A) >>> 0, gt = P + K >>> 0;
-      I = x, x = B, B = v, v = W + N >>> 0, W = A, A = S, S = y, y = N + gt >>> 0;
+      const W = (F(v, 6) ^ F(v, 11) ^ F(v, 25)) >>> 0, R = (v & B ^ ~v & x) >>> 0, N = I + W + R + mt[b] + a[b] >>> 0, P = (F(y, 2) ^ F(y, 13) ^ F(y, 22)) >>> 0, K = (y & S ^ y & A ^ S & A) >>> 0, gt = P + K >>> 0;
+      I = x, x = B, B = v, v = M + N >>> 0, M = A, A = S, S = y, y = N + gt >>> 0;
     }
-    t = t + y >>> 0, n = n + S >>> 0, s = s + A >>> 0, r = r + W >>> 0, o = o + v >>> 0, i = i + B >>> 0, c = c + x >>> 0, l = l + I >>> 0;
+    t = t + y >>> 0, n = n + S >>> 0, s = s + A >>> 0, r = r + M >>> 0, o = o + v >>> 0, i = i + B >>> 0, c = c + x >>> 0, l = l + I >>> 0;
   }
   const m = new Uint8Array(32), g = new DataView(m.buffer);
   return g.setUint32(0, t, !1), g.setUint32(4, n, !1), g.setUint32(8, s, !1), g.setUint32(12, r, !1), g.setUint32(16, o, !1), g.setUint32(20, i, !1), g.setUint32(24, c, !1), g.setUint32(28, l, !1), m;
@@ -214,10 +214,10 @@ function st(e, t) {
   return n < 0n && (n = -n, r = -r, i = -i), { gcd: n, x: r, y: i };
 }
 function at(e, t) {
-  const n = e.a, s = t.a, r = e.b, o = t.b, i = t.c, c = (r + o) / 2n, l = st(n, s), _ = l.gcd, w = l.y, d = st(_, c), u = d.gcd, a = d.x, m = d.y, g = a * w, h = m, y = g * (r - o), S = h * i * 2n, A = y - S, W = 2n * n / u;
-  let v = A % W;
-  v < 0n && (v += W);
-  const B = v, x = u * u, I = n * s / x, M = s / u * B, R = o + M, N = R * R - e.discriminant, P = I * 4n, K = N / P;
+  const n = e.a, s = t.a, r = e.b, o = t.b, i = t.c, c = (r + o) / 2n, l = st(n, s), _ = l.gcd, w = l.y, d = st(_, c), u = d.gcd, a = d.x, m = d.y, g = a * w, h = m, y = g * (r - o), S = h * i * 2n, A = y - S, M = 2n * n / u;
+  let v = A % M;
+  v < 0n && (v += M);
+  const B = v, x = u * u, I = n * s / x, W = s / u * B, R = o + W, N = R * R - e.discriminant, P = I * 4n, K = N / P;
   return lt({ a: I, b: R, c: K, discriminant: e.discriminant });
 }
 function ft(e) {
@@ -419,8 +419,8 @@ function Bt(e, t, n, s, r) {
   const h = 65, S = 90 - h;
   for (let b = 0; b < n; b++)
     if (g = ft(g), r && b % 100 === 0) {
-      const M = b / n * S;
-      r(Math.floor(h + M));
+      const W = b / n * S;
+      r(Math.floor(h + W));
     }
   r && r(90);
   const A = At(u, g, l), v = xt(n) / A, B = vt(u, v);
@@ -476,7 +476,7 @@ try {
 } catch (e) {
   console.warn("Failed to check WASM support, defaulting to false:", e), O = !1;
 }
-async function Wt(e) {
+async function Mt(e) {
   if (!O)
     return console.warn("WebAssembly not supported in this environment. Using JS fallback."), !1;
   try {
@@ -495,7 +495,7 @@ self.onmessage = async (e) => {
   if (t === "SOLVE")
     try {
       const o = r || !O;
-      !o && !H && (rt = await Wt(s));
+      !o && !H && (rt = await Mt(s));
       const i = rt && H && !o;
       self.postMessage({
         type: "STATUS",
@@ -518,7 +518,7 @@ self.onmessage = async (e) => {
               const u = self.performance.memory.usedJSHeapSize;
               u > l && (l = u);
             }
-            self.postMessage({ type: "PROGRESS", percent: d.percent }), await new Promise((u) => setTimeout(u, 0));
+            self.postMessage({ type: "PROGRESS", percent: Math.floor(d.percent) }), await new Promise((u) => setTimeout(u, 0));
           } else
             d.status === "done" && (c = d.output, l = c.memory_bytes || l, w = !0);
         }
@@ -555,7 +555,7 @@ self.onmessage = async (e) => {
   });
 };
 let f;
-function Mt(e) {
+function Wt(e) {
   const t = f.__externref_table_alloc();
   return f.__wbindgen_externrefs.set(t, e), t;
 }
@@ -618,7 +618,7 @@ function Ot(e, t) {
   try {
     return e.apply(this, t);
   } catch (n) {
-    const s = Mt(n);
+    const s = Wt(n);
     f.__wbindgen_exn_store(s);
   }
 }

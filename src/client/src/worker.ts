@@ -89,7 +89,7 @@ self.onmessage = async (event) => {
                             const currentMem = (self.performance as any).memory.usedJSHeapSize;
                             if (currentMem > memoryUsage) memoryUsage = currentMem;
                         }
-                        self.postMessage({ type: 'PROGRESS', percent: stepRes.percent });
+                        self.postMessage({ type: 'PROGRESS', percent: Math.floor(stepRes.percent) });
 
                         // Yield to event loop to allow message dispatch
                         await new Promise(r => setTimeout(r, 0));
