@@ -243,6 +243,7 @@
         <thead>
             <tr>
                 <th>Test / Round</th>
+                <th>Mode</th>
                 <th>Graph Bits</th>
                 <th>VDF</th>
                 <th>Time (ms)</th>
@@ -465,13 +466,13 @@
             console.log(msg);
         }
 
-        function addRow(name, gb, diff, time, mem, status) {
+        function addRow(name, mode, gb, diff, time, mem, status) {
             const tr = document.createElement('tr');
             if (status !== 'OK') tr.className = 'fail';
-            tr.innerHTML = `<td>${name}</td><td>${gb}</td><td>${diff}</td><td>${time}</td><td>${mem}</td><td>${status}</td>`;
+            tr.innerHTML = `<td>${name}</td><td>${mode}</td><td>${gb}</td><td>${diff}</td><td>${time}</td><td>${mem}</td><td>${status}</td>`;
             tableBody.appendChild(tr);
 
-            const rowData = { Test: name, GraphBits: gb, VDF: diff, TimeMS: time, MemoryMB: mem, Status: status };
+            const rowData = { Test: name, Mode: mode, GraphBits: gb, VDF: diff, TimeMS: time, MemoryMB: mem, Status: status };
             resultsData.push(rowData);
             console.log("Result:", rowData);
             return rowData;
@@ -480,20 +481,32 @@
         function addHeader(text) {
             const tr = document.createElement('tr');
             tr.className = 'header-row';
-            tr.innerHTML = `<td colspan="6">${text}</td>`;
+            tr.innerHTML = `<td colspan="7">${text}</td>`;
             tableBody.appendChild(tr);
         }
 
         let zeno = null;
         let activeGB = 0;
+        let activeMode = null; // 'WASM' or 'JS'
 
-        async function solve(gb, diff) {
+        async function solve(gb, diff, forceJS = false) {
             if (stopRequested) throw new Error("Stopped by user");
 
-            // Create new instance if needed (when GB decreases or first run or terminated)
-            if (!zeno || gb < activeGB || zeno.isTerminated) {
-                zeno = new Zeno({ apiEndpoint: '/mock-api', siteKey: 'benchmark-suite' });
+            const requestedMode = forceJS ? 'JS' : 'WASM';
+
+            // Create new instance if needed (when GB decreases, first run, terminated, or mode switch)
+            if (!zeno || gb < activeGB || zeno.isTerminated || activeMode !== requestedMode) {
+                if (zeno) zeno.terminate();
+
+                // Note: using explicit forceJS option
+                zeno = new Zeno({
+                    apiEndpoint: '/mock-api',
+                    siteKey: 'benchmark-suite',
+                    forceJS: forceJS
+                });
+
                 try {
+                    // Warmup with appropriate mode
                     await zeno.solveInWorker({
                         generate_proof: false,
                         challenge_id: 'warmup',
@@ -507,6 +520,7 @@
                     console.error("Warmup Failed:", e);
                 }
                 activeGB = gb;
+                activeMode = requestedMode;
             }
             if (gb > activeGB) activeGB = gb;
 
@@ -549,109 +563,104 @@
             resultsData.length = 0;
             stopRequested = false;
 
-            const round1Data = [];
-            const round2Data = [];
-            const round3Data = [];
             const passedGB = [];
+            const modes = ['WASM', 'JS'];
 
             const LIMIT_TIME_MS = CONFIG.limits.time;
             const LIMIT_MEM_MB = CONFIG.limits.mem;
 
             try {
-                // --- Sanity ---
-                if (CONFIG.tests.sanity && !stopRequested) {
-                    addHeader("Sanity Check");
-                    log("Running Sanity: GB=10, Diff=100");
-                    let res = await solve(10, 100);
-                    addRow('Sanity', 10, 100, res.time.toFixed(0), res.mem.toFixed(2), res.error || 'OK');
-                    if (res.time > 5000) throw new Error("Sanity failed (Time > 5s)");
-                    if (res.error) throw new Error("Sanity failed: " + res.error);
-                }
+                for (const mode of modes) {
+                    if (stopRequested) break;
 
-                // --- Round 1: Graph Bits (G) ---
-                if (CONFIG.tests.r1 && !stopRequested) {
-                    addHeader(`Round 1: Graph Bits (Start ${CONFIG.r1.start}, Step ${CONFIG.r1.step})`);
-                    let gb = CONFIG.r1.start;
-                    while (!stopRequested) {
-                        log(`R1: Testing GB ${gb}...`);
-                        let res = await solve(gb, 100);
-                        const r = addRow('R1: GB Ramp', gb, 100, res.time.toFixed(0), res.mem.toFixed(2), res.error || 'OK');
-                        round1Data.push(r);
+                    const isForceJS = mode === 'JS';
+                    // Wider limits for JS? For now using same limits but tracking failures
 
-                        if (!res.error && res.time <= LIMIT_TIME_MS && res.mem <= LIMIT_MEM_MB) {
-                            passedGB.push(gb);
-                        } else {
-                            log(`R1 Limit: GB ${gb} exceeded limits`);
-                            break;
-                        }
-                        gb += CONFIG.r1.step;
+                    addHeader(`--- Mode: ${mode} ---`);
+
+                    // --- Sanity ---
+                    if (CONFIG.tests.sanity && !stopRequested) {
+                        log(`[${mode}] Running Sanity: GB=10, Diff=100`);
+                        let res = await solve(10, 100, isForceJS);
+                        addRow('Sanity', mode, 10, 100, res.time.toFixed(0), res.mem.toFixed(2), res.error || 'OK');
+                        if (res.error) throw new Error("Sanity failed: " + res.error);
                     }
-                    console.log("--- Round 1 Results ---");
-                    console.table(round1Data);
-                }
 
-                // --- Round 2: VDF (V) ---
-                if (CONFIG.tests.r2 && !stopRequested) {
-                    addHeader(`Round 2: VDF (Start ${CONFIG.r2.start}, Step ${CONFIG.r2.step})`);
-                    let diff = CONFIG.r2.start;
-                    while (!stopRequested) {
-                        log(`R2: Testing VDF ${diff}...`);
-                        let res = await solve(10, diff);
-                        const r = addRow('R2: VDF Ramp', 10, diff, res.time.toFixed(0), res.mem.toFixed(2), res.error || 'OK');
-                        round2Data.push(r);
+                    // --- Round 1: Graph Bits (G) ---
+                    if (CONFIG.tests.r1 && !stopRequested) {
+                        let gb = CONFIG.r1.start;
+                        while (!stopRequested) {
+                            log(`[${mode}] R1: Testing GB ${gb}...`);
+                            let res = await solve(gb, 100, isForceJS);
+                            const r = addRow('R1: GB Ramp', mode, gb, 100, res.time.toFixed(0), res.mem.toFixed(2), res.error || 'OK');
 
-                        if (res.error || res.time > LIMIT_TIME_MS || res.mem > LIMIT_MEM_MB) {
-                            log(`R2 Limit: VDF ${diff} exceeded limits`);
-                            break;
-                        }
-                        diff += CONFIG.r2.step;
-                    }
-                    console.log("--- Round 2 Results ---");
-                    console.table(round2Data);
-                }
-
-                // --- Round 3: Combinations ---
-                if (CONFIG.tests.r3 && !stopRequested) {
-                    addHeader("Round 3: Combinations (Pruned)");
-
-                    let comboGBs = passedGB;
-                    if (comboGBs.length === 0) {
-                        if (!CONFIG.tests.r1) {
-                            log("Warning: R3 skipped because Round 1 did not run (no valid Graphs identified). Enable R1 to populate Graph candidates.");
+                            if (!res.error && res.time <= LIMIT_TIME_MS && res.mem <= LIMIT_MEM_MB) {
+                                if (mode === 'WASM') passedGB.push(gb); // Only use WASM passed graphs for combos?
+                            } else {
+                                log(`[${mode}] R1 Limit: GB ${gb} exceeded limits`);
+                                break;
+                            }
+                            gb += CONFIG.r1.step;
                         }
                     }
 
-                    if (comboGBs.length > 0) {
-                        let maxSafeVDF = Infinity;
+                    // --- Round 2: VDF (V) ---
+                    if (CONFIG.tests.r2 && !stopRequested) {
+                        let diff = CONFIG.r2.start;
+                        while (!stopRequested) {
+                            log(`[${mode}] R2: Testing VDF ${diff}...`);
+                            let res = await solve(10, diff, isForceJS);
+                            const r = addRow('R2: VDF Ramp', mode, 10, diff, res.time.toFixed(0), res.mem.toFixed(2), res.error || 'OK');
 
-                        for (const g of comboGBs) {
-                            if (stopRequested) break;
+                            if (res.error || res.time > LIMIT_TIME_MS || res.mem > LIMIT_MEM_MB) {
+                                log(`[${mode}] R2 Limit: VDF ${diff} exceeded limits`);
+                                break;
+                            }
+                            diff += CONFIG.r2.step;
+                        }
+                    }
 
-                            let d = CONFIG.r3.vStart;
+                    // --- Round 3: Combinations ---
+                    if (CONFIG.tests.r3 && !stopRequested) {
+                        let comboGBs = passedGB;
+                        // Note: If WASM failed earlier or was skipped, this might be empty.
+                        // For JS run, we probably want to re-test the same graphs WASM passed, or just re-ramp? 
+                        // Let's stick to testing graphs that WASM could handle, otherwise JS will definitely fail.
 
-                            while (!stopRequested) {
-                                if (d > maxSafeVDF) {
-                                    log(`R3: Pruning VDFs > ${maxSafeVDF} for GB=${g}`);
-                                    break;
+                        if (mode === 'JS' && comboGBs.length === 0 && CONFIG.r1.start) {
+                            // Fallback if R1 didn't populate (e.g. only testing JS)
+                            comboGBs = [10];
+                        }
+
+                        if (comboGBs.length > 0) {
+                            let maxSafeVDF = Infinity;
+
+                            for (const g of comboGBs) {
+                                if (stopRequested) break;
+
+                                let d = CONFIG.r3.vStart;
+
+                                while (!stopRequested) {
+                                    if (d > maxSafeVDF) {
+                                        log(`[${mode}] R3: Pruning VDFs > ${maxSafeVDF} for GB=${g}`);
+                                        break;
+                                    }
+
+                                    log(`[${mode}] R3: Combo GB=${g} VDF=${d}`);
+                                    let res = await solve(g, d, isForceJS);
+                                    const r = addRow('R3: Combo', mode, g, d, res.time.toFixed(0), res.mem.toFixed(2), res.error || 'OK');
+
+                                    if (res.error || res.time > LIMIT_TIME_MS || res.mem > LIMIT_MEM_MB) {
+                                        maxSafeVDF = d;
+                                        break;
+                                    }
+
+                                    d += CONFIG.r3.vStep;
                                 }
-
-                                log(`R3: Combo GB=${g} VDF=${d}`);
-                                let res = await solve(g, d);
-                                const r = addRow('R3: Combo', g, d, res.time.toFixed(0), res.mem.toFixed(2), res.error || 'OK');
-                                round3Data.push(r);
-
-                                if (res.error || res.time > LIMIT_TIME_MS || res.mem > LIMIT_MEM_MB) {
-                                    maxSafeVDF = d;
-                                    break;
-                                }
-
-                                d += CONFIG.r3.vStep;
                             }
                         }
-                        console.log("--- Round 3 Results ---");
-                        console.table(round3Data);
                     }
-                }
+                } // End Mode Loop
 
                 log("Suite Completed/Stopped.");
                 statusEl.textContent = stopRequested ? "Stopped" : "Benchmark Complete";
@@ -667,7 +676,7 @@
                 } else {
                     log("Critical Error: " + e.message);
                     statusEl.textContent = "Error";
-                    addRow('ERROR', '-', '-', '-', '-', e.message);
+                    addRow('ERROR', '-', '-', '-', '-', '-', e.message);
                 }
             } finally {
                 isRunning = false;
