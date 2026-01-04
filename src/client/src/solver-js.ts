@@ -509,30 +509,17 @@ function millerRabin(n: bigint, rounds: number): boolean {
         s++;
     }
 
-    // Use random witnesses to match Rust's behavior (K=40)
-    // Deterministic witnesses [2..37] are only guaranteed for u64.
-    // For large integers, random witnesses are safer to avoid pseudoprime divergence.
-    for (let i = 0; i < rounds; i++) {
-        // Generate random witness 'a' in range [2, n-2]
-        // Simple random generation for BigInt
-        const range = n - 3n;
-        const bits = range.toString(2).length;
+    // Use deterministic witnesses (first 40 primes)
+    // matches Rust implementation to ensure parity in hashToPrime
+    const WITNESSES = [
+        2n, 3n, 5n, 7n, 11n, 13n, 17n, 19n, 23n, 29n, 31n, 37n, 41n, 43n, 47n, 53n, 59n, 61n, 67n, 71n,
+        73n, 79n, 83n, 89n, 97n, 101n, 103n, 107n, 109n, 113n, 127n, 131n, 137n, 139n, 149n, 151n, 157n, 163n, 167n, 173n
+    ];
 
-        let a = 0n;
-        while (true) {
-            // Generate random BigInt
-            let randBig = 0n;
-            for (let b = 0; b < bits; b += 32) {
-                const chunk = Math.floor(Math.random() * 0xFFFFFFFF);
-                randBig = (randBig << 32n) | BigInt(chunk);
-            }
-            // Mask to bits
-            // (Simplification: just taking modulo can be biased but acceptable for MR witness generation relative to performance here)
-            // Better: rejection sampling
-            a = (randBig % range) + 2n;
-            if (a < n - 1n) break;
-        }
+    for (const a of WITNESSES) {
+        if (n <= a) break; // Witness must be < n
 
+        // x = a^d mod n
         let x = modPow(a, d, n);
 
         if (x === 1n || x === n - 1n) continue;
