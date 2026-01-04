@@ -241,7 +241,7 @@ const TEMPLATE = `
     --zeno-border-color: #dddddd8f;
     --zeno-border-radius: 14px;
     --zeno-widget-height: 50px;
-    --zeno-widget-width: 250px;
+    --zeno-widget-width: 320px;
     --zeno-widget-padding: 10px;
     --zeno-color: #212121;
     --zeno-font: system-ui, -apple-system, sans-serif;
