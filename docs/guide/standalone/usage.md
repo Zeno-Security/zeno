@@ -30,7 +30,7 @@ Generates a new cryptographic challenge.
   "challenge_id": "UUID",
   "seed": "HEX",
   "discriminant": "HEX",
-  "vdf": 100,
+  "vdf": 450,
   "graph_bits": 18,
   "issued_at": 1234567890,
   "expires_at": 1234567950
@@ -177,7 +177,8 @@ Controls the number of VDF iterations. Prevents pre-computation attacks.
 
 | VDF | Added Time | Total Time (GB=18) | Use Case |
 | :--- | :--- | :--- | :--- |
-| **100** | ~0.6s | ~0.9s | **Default** |
+| **100** | ~0.6s | ~0.9s | Minimum |
+| **450** | ~2.5s | ~3.0s | **Default** |
 | **200** | ~1.2s | ~1.5s | Enhanced |
 | **300** | ~1.8s | ~2.1s | High-value actions |
 | **500** | ~3.0s | ~3.3s | Strong sequential |
@@ -195,7 +196,7 @@ Controls the number of VDF iterations. Prevents pre-computation attacks.
 | Script Bots | GB=13, VDF=100 | ~0.9s | 2 MB | Stops automation |
 | Bot Farms | GB=15, VDF=150 | ~1.3s | 5 MB | Exceeds cheap VPS |
 | GPU Attacks | GB=17, VDF=100 | ~0.5s | 16 MB | Memory-bound |
-| **ASIC/GPU** | **GB=18, VDF=100** | **~0.9s** | **32 MB** | **Default** |
+| **ASIC/GPU** | **GB=18, VDF=450** | **~3.0s** | **32 MB** | **Default** |
 | High-Value | GB=18, VDF=300 | ~2.7s | 32 MB | Login, payment |
 | Maximum | GB=19, VDF=200 | ~2.6s | 62 MB | Critical systems |
 

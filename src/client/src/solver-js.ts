@@ -850,7 +850,7 @@ export function solveJS(
         cycle,
         y: bytesToHex(yBytes),
         pi: bytesToHex(piBytes),
-        memory_bytes: 0 // Not applicable for JS
+        memory_bytes: (1 << graphBits) * 1200 // Fallback estimate: ~1.2KB per node overhead for JS objects
     };
 }
 

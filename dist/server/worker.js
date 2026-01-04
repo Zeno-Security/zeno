@@ -1,3 +1,13 @@
+/*
+ * Required Notice: © Copyright 2025 KSEC - Erez Kalman (kaerez[at]gmail[dot]com | www.kalman.co.il | https://github.com/zeno-security/zeno | https://github.com/kaerez)
+ *
+ * This software is licensed under the PolyForm Strict License 1.0.0.
+ * You may obtain a copy of the License at:
+ * * https://polyformproject.org/licenses/strict/1.0.0/
+ *
+ * SPDX-License-Identifier: PolyForm-Strict-1.0.0
+ */
+
 var __defProp = Object.defineProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -4435,8 +4445,8 @@ var DEFAULT_CONFIG = {
   // Open by default if null? No, Spec says universal validation. But if not set in config?
   // Spec 2.3: "Features: Origin/Referer regex enforcement."
   allowed_referers: null,
-  vdf: 100,
-  // Medium default (0.5s)
+  vdf: 450,
+  // Updated Default (~2-3s)
   graph_bits: 18,
   // Primary Defense: 18 bits
   challenge_ttl: 60,

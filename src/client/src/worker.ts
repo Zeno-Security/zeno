@@ -74,6 +74,13 @@ self.onmessage = async (event) => {
             } else {
                 // JS Fallback Path with progress reporting
                 const progressCallback = (percent: number) => {
+                    // Start of measurement
+                    if ((self.performance as any)?.memory?.usedJSHeapSize) {
+                        const currentMem = (self.performance as any).memory.usedJSHeapSize;
+                        if (currentMem > memoryUsage) {
+                            memoryUsage = currentMem;
+                        }
+                    }
                     self.postMessage({ type: 'PROGRESS', percent });
                 };
 
@@ -84,7 +91,11 @@ self.onmessage = async (event) => {
                     challenge.graph_bits,
                     progressCallback
                 );
-                memoryUsage = 0; // Not tracked in JS mode
+
+                // If we measured a peak, use it. Otherwise use the fallback calculation from result.
+                if (memoryUsage === 0 && result.memory_bytes) {
+                    memoryUsage = result.memory_bytes;
+                }
             }
 
             self.postMessage({

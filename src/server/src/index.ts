@@ -36,7 +36,7 @@ const DEFAULT_CONFIG: SiteConfig = {
     allowed_origins: null, // Open by default if null? No, Spec says universal validation. But if not set in config?
     // Spec 2.3: "Features: Origin/Referer regex enforcement."
     allowed_referers: null,
-    vdf: 100, // Medium default (0.5s)
+    vdf: 450, // Updated Default (~2-3s)
     graph_bits: 18, // Primary Defense: 18 bits
     challenge_ttl: 60,
     token_ttl: 3600,

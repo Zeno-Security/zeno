@@ -47,8 +47,8 @@ document.querySelector('zeno-widget').addEventListener('solve', (e) => {
 | Parameter | Default | Effect |
 | :--- | :--- | :--- |
 | `graph_bits` | **18** | ~32 MB RAM required |
-| `vdf` | **100** | ~0.6s sequential delay |
-| **Total** | — | **~0.9s solve time** |
+| `vdf` | **450** | ~2.5s sequential delay |
+| **Total** | — | **~3s solve time** |
 
 ## Protection Targets
 
@@ -57,7 +57,7 @@ document.querySelector('zeno-widget').addEventListener('solve', (e) => {
 | Script Bots | GB=13, VDF=100 | ~0.9s | 2 MB |
 | Bot Farms | GB=15, VDF=150 | ~1.3s | 5 MB |
 | GPU Attacks | GB=17, VDF=100 | ~0.5s | 16 MB |
-| **ASIC/GPU (Default)** | **GB=18, VDF=100** | **~0.9s** | **32 MB** |
+| **ASIC/GPU (Default)** | **GB=18, VDF=450** | **~3s** | **32 MB** |
 | High-Value Actions | GB=18, VDF=300 | ~2.7s | 32 MB |
 | Maximum Security | GB=19, VDF=200 | ~2.6s | 62 MB |
 
